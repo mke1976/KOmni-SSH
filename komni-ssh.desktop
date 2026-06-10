@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=KOmni-SSH
+Comment=SSH Connection and Remote Status Monitor
+Exec=komni-ssh
+Icon=komni-ssh
+Terminal=false
+Type=Application
+Categories=Utility;Network;
+StartupNotify=true

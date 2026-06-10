@@ -1,0 +1,55 @@
+# ─── CMake Build Artifacts ───────────────────────────────────────────────────
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# ─── Qt / MOC / UIC / RCC Generated Files ────────────────────────────────────
+*_autogen/
+*.moc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+.qt/
+
+# ─── Compiled Binaries & Objects ─────────────────────────────────────────────
+*.o
+*.a
+*.so
+*.so.*
+*.dylib
+*.exe
+*.out
+komni-ssh
+
+# ─── RPM Packaging ───────────────────────────────────────────────────────────
+rpmbuild/BUILD/
+rpmbuild/BUILDROOT/
+rpmbuild/RPMS/
+rpmbuild/SRPMS/
+rpmbuild/SOURCES/
+rpmbuild/SPECS/
+*.rpm
+*.srpm
+
+# ─── Editor & IDE ────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.user
+*.creator.user.*
+CMakeLists.txt.user
+
+# ─── Misc ────────────────────────────────────────────────────────────────────
+*.log
+*.tmp
