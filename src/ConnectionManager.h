@@ -4,6 +4,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QProgressDialog>
+#include <QPointer>
 #include <QProcess>
 #include "ConfigManager.h"
 
@@ -29,11 +30,12 @@ private:
     struct VpnState {
         VpnConfig pc;
         QString appChoice;
-        QProgressDialog* progress = nullptr;
+        QPointer<QProgressDialog> progress; // QPointer: auto-nulls when dialog is destroyed
         int step = 0;
         bool hasNativeIpv6 = false;
         int attempt = 1;
         QProcess* proc = nullptr;
+        bool cleaned = false;               // Guard against double-cleanup
     };
 
     void startVpnSequence(VpnState* state);

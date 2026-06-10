@@ -113,6 +113,7 @@ void ConnectionManager::connectVpn(const VpnConfig& pc, const QString& appChoice
     state->progress->show();
 
     connect(state->progress, &QProgressDialog::canceled, this, [this, state]() {
+        // Only run if not already cleaned up by the success path
         cleanupVpnState(state, false);
     });
 
@@ -218,12 +219,16 @@ void ConnectionManager::connectPrivate(VpnState* state) {
                 
                 QTimer::singleShot(500, this, [this, state]() {
                     if (state->progress) {
+                        // Disconnect 'canceled' BEFORE close() to prevent double-cleanup.
+                        // QProgressDialog::close() can emit canceled on some Qt builds,
+                        // which would trigger cleanupVpnState a second time and corrupt the heap.
+                        disconnect(state->progress, &QProgressDialog::canceled, nullptr, nullptr);
                         state->progress->close();
                     }
-                    
+
                     QStringList sshOpts;
                     sshOpts << "-o" << "KexAlgorithms=curve25519-sha256";
-                    
+
                     QString target = QString("%1@%2").arg(state->pc.user).arg(state->pc.ip);
                     launchSsh(target, sshOpts, state->appChoice, true, state->hasNativeIpv6 ? "" : state->pc.bridge, state->pc.priv);
                     cleanupVpnState(state, true);
@@ -237,9 +242,15 @@ void ConnectionManager::connectPrivate(VpnState* state) {
 }
 
 void ConnectionManager::cleanupVpnState(VpnState* state, bool success) {
+    // Guard: QProgressDialog::canceled can race with the success-path timer.
+    // The 'cleaned' flag makes this function idempotent.
+    if (state->cleaned) return;
+    state->cleaned = true;
+
     if (state->proc) {
         state->proc->kill();
         state->proc->deleteLater();
+        state->proc = nullptr;
     }
     if (!success) {
         // Tears down partially set up connections
@@ -248,8 +259,10 @@ void ConnectionManager::cleanupVpnState(VpnState* state, bool success) {
         }
         QProcess::execute("nmcli", QStringList() << "connection" << "down" << state->pc.priv);
     }
+    // QPointer: safe even if dialog was already destroyed externally
     if (state->progress) {
         state->progress->deleteLater();
+        state->progress = nullptr;
     }
     delete state;
 }
