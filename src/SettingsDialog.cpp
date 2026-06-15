@@ -111,9 +111,6 @@ QWidget* SettingsDialog::createNgrokSection() {
         QLineEdit* nameEdit = new QLineEdit(detailsWidget);
         form->addRow("Computer Name:", nameEdit);
 
-        QLineEdit* nickEdit = new QLineEdit(detailsWidget);
-        form->addRow("CB Nickname:", nickEdit);
-
         QLineEdit* userEdit = new QLineEdit(detailsWidget);
         form->addRow("User:", userEdit);
 
@@ -132,7 +129,6 @@ QWidget* SettingsDialog::createNgrokSection() {
         // Track UI elements
         m_ngrokUi[i].enabledCheck = enableCheck;
         m_ngrokUi[i].nameEdit = nameEdit;
-        m_ngrokUi[i].nickEdit = nickEdit;
         m_ngrokUi[i].userEdit = userEdit;
         m_ngrokUi[i].apiEdit = apiEdit;
         m_ngrokUi[i].monCheck = monCheck;
@@ -168,9 +164,6 @@ QWidget* SettingsDialog::createVpnSection() {
         QLineEdit* nameEdit = new QLineEdit(detailsWidget);
         form->addRow("Computer Name:", nameEdit);
 
-        QLineEdit* nickEdit = new QLineEdit(detailsWidget);
-        form->addRow("CB Nickname:", nickEdit);
-
         QLineEdit* userEdit = new QLineEdit(detailsWidget);
         form->addRow("User:", userEdit);
 
@@ -193,7 +186,6 @@ QWidget* SettingsDialog::createVpnSection() {
 
         m_vpnUi[i].enabledCheck = enableCheck;
         m_vpnUi[i].nameEdit = nameEdit;
-        m_vpnUi[i].nickEdit = nickEdit;
         m_vpnUi[i].userEdit = userEdit;
         m_vpnUi[i].ipEdit = ipEdit;
         m_vpnUi[i].bridgeEdit = bridgeEdit;
@@ -231,9 +223,6 @@ QWidget* SettingsDialog::createDirectSection() {
         QLineEdit* nameEdit = new QLineEdit(detailsWidget);
         form->addRow("Computer Name:", nameEdit);
 
-        QLineEdit* nickEdit = new QLineEdit(detailsWidget);
-        form->addRow("CB Nickname:", nickEdit);
-
         QLineEdit* userEdit = new QLineEdit(detailsWidget);
         form->addRow("User:", userEdit);
 
@@ -253,7 +242,6 @@ QWidget* SettingsDialog::createDirectSection() {
 
         m_directUi[i].enabledCheck = enableCheck;
         m_directUi[i].nameEdit = nameEdit;
-        m_directUi[i].nickEdit = nickEdit;
         m_directUi[i].userEdit = userEdit;
         m_directUi[i].hostEdit = hostEdit;
         m_directUi[i].portEdit = portEdit;
@@ -277,10 +265,6 @@ QWidget* SettingsDialog::createImportExportSection() {
     connect(importBtn, &QPushButton::clicked, this, &SettingsDialog::onImportClicked);
     layout->addWidget(importBtn);
 
-    QPushButton* shareBtn = new QPushButton("Share", box);
-    connect(shareBtn, &QPushButton::clicked, this, &SettingsDialog::onShareClicked);
-    layout->addWidget(shareBtn);
-
     return box;
 }
 
@@ -295,7 +279,6 @@ void SettingsDialog::loadSettings() {
         const auto& pc = config.ngrokPcs[i];
         m_ngrokUi[i].enabledCheck->setChecked(pc.enabled);
         m_ngrokUi[i].nameEdit->setText(pc.name);
-        m_ngrokUi[i].nickEdit->setText(pc.nickname);
         m_ngrokUi[i].userEdit->setText(pc.user);
         m_ngrokUi[i].apiEdit->setText(pc.api);
         m_ngrokUi[i].monCheck->setChecked(pc.monitor);
@@ -307,7 +290,6 @@ void SettingsDialog::loadSettings() {
         const auto& pc = config.vpnPcs[i];
         m_vpnUi[i].enabledCheck->setChecked(pc.enabled);
         m_vpnUi[i].nameEdit->setText(pc.name);
-        m_vpnUi[i].nickEdit->setText(pc.nickname);
         m_vpnUi[i].userEdit->setText(pc.user);
         m_vpnUi[i].ipEdit->setText(pc.ip);
         m_vpnUi[i].bridgeEdit->setText(pc.bridge);
@@ -321,7 +303,6 @@ void SettingsDialog::loadSettings() {
         const auto& pc = config.directPcs[i];
         m_directUi[i].enabledCheck->setChecked(pc.enabled);
         m_directUi[i].nameEdit->setText(pc.name);
-        m_directUi[i].nickEdit->setText(pc.nickname);
         m_directUi[i].userEdit->setText(pc.user);
         m_directUi[i].hostEdit->setText(pc.host);
         m_directUi[i].portEdit->setText(pc.port);
@@ -341,8 +322,7 @@ void SettingsDialog::saveSettings() {
         auto& pc = config.ngrokPcs[i];
         pc.enabled = m_ngrokUi[i].enabledCheck->isChecked();
         pc.name = m_ngrokUi[i].nameEdit->text().trimmed();
-        pc.nickname = m_ngrokUi[i].nickEdit->text().trimmed();
-        if (pc.nickname.isEmpty()) pc.nickname = pc.name;
+        pc.nickname = pc.name;
         pc.user = m_ngrokUi[i].userEdit->text().trimmed();
         pc.api = m_ngrokUi[i].apiEdit->text().trimmed();
         pc.monitor = m_ngrokUi[i].monCheck->isChecked();
@@ -353,8 +333,7 @@ void SettingsDialog::saveSettings() {
         auto& pc = config.vpnPcs[i];
         pc.enabled = m_vpnUi[i].enabledCheck->isChecked();
         pc.name = m_vpnUi[i].nameEdit->text().trimmed();
-        pc.nickname = m_vpnUi[i].nickEdit->text().trimmed();
-        if (pc.nickname.isEmpty()) pc.nickname = pc.name;
+        pc.nickname = pc.name;
         pc.user = m_vpnUi[i].userEdit->text().trimmed();
         pc.ip = m_vpnUi[i].ipEdit->text().trimmed();
         pc.bridge = m_vpnUi[i].bridgeEdit->text().trimmed();
@@ -367,8 +346,7 @@ void SettingsDialog::saveSettings() {
         auto& pc = config.directPcs[i];
         pc.enabled = m_directUi[i].enabledCheck->isChecked();
         pc.name = m_directUi[i].nameEdit->text().trimmed();
-        pc.nickname = m_directUi[i].nickEdit->text().trimmed();
-        if (pc.nickname.isEmpty()) pc.nickname = pc.name;
+        pc.nickname = pc.name;
         pc.user = m_directUi[i].userEdit->text().trimmed();
         pc.host = m_directUi[i].hostEdit->text().trimmed();
         pc.port = m_directUi[i].portEdit->text().trimmed();
@@ -409,10 +387,4 @@ void SettingsDialog::onExportClicked() {
     }
 }
 
-void SettingsDialog::onShareClicked() {
-    // Sharing details: copy configuration file path to clipboard
-    QString path = ConfigManager::instance().configFilePath();
-    QApplication::clipboard()->setText(path);
-    QMessageBox::information(this, "Share Configuration", 
-                             QString("Configuration path copied to clipboard:\n%1").arg(path));
-}
+

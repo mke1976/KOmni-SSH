@@ -171,6 +171,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 }
 
 void MainWindow::setupUi() {
+    QMenuBar* m_menuBar = menuBar();
+    QMenu* settingsMenu = m_menuBar->addMenu("Settings");
+    QAction* configureAct = new QAction(QIcon::fromTheme("configure", style()->standardIcon(QStyle::SP_FileDialogListView)), "Configure KOmni-SSH...", this);
+    connect(configureAct, &QAction::triggered, this, &MainWindow::onSettingsTriggered);
+    settingsMenu->addAction(configureAct);
+
     QWidget* central = new QWidget(this);
     QVBoxLayout* mainLayout = new QVBoxLayout(central);
     mainLayout->setContentsMargins(10, 10, 10, 10);
@@ -186,7 +192,7 @@ void MainWindow::setupUi() {
     connect(refreshAct, &QAction::triggered, this, &MainWindow::onRefreshTriggered);
     toolbar->addAction(refreshAct);
 
-    QAction* settingsAct = new QAction(style()->standardIcon(QStyle::SP_FileDialogListView), "Settings", this);
+    QAction* settingsAct = new QAction(QIcon::fromTheme("configure", style()->standardIcon(QStyle::SP_FileDialogListView)), "Configure KOmni-SSH...", this);
     connect(settingsAct, &QAction::triggered, this, &MainWindow::onSettingsTriggered);
     toolbar->addAction(settingsAct);
 
@@ -232,8 +238,9 @@ void MainWindow::setupTrayIcon() {
     QAction* refreshAct = trayMenu->addAction("Refresh Status");
     connect(refreshAct, &QAction::triggered, this, &MainWindow::onRefreshTriggered);
 
-    QAction* settingsAct = trayMenu->addAction("Settings");
+    QAction* settingsAct = new QAction(QIcon::fromTheme("configure", style()->standardIcon(QStyle::SP_FileDialogListView)), "Configure KOmni-SSH...", this);
     connect(settingsAct, &QAction::triggered, this, &MainWindow::onSettingsTriggered);
+    trayMenu->addAction(settingsAct);
 
     trayMenu->addSeparator();
     QAction* quitAct = trayMenu->addAction("Quit");

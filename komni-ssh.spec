@@ -1,5 +1,5 @@
 Name:           komni-ssh
-Version:        1.0.0
+Version:        1.0.1
 Release:        1%{?dist}
 Summary:        KDE native SSH connection and remote status monitor
 
@@ -45,5 +45,10 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/pixmaps/%{name}.png
 
 %changelog
+* Mon Jun 15 2026 mk <mk@address.com> - 1.0.1-1
+- Remove CB Nickname field from settings
+- Remove Settings Share button
+- Use standard native KDE settings menu action and icon
+
 * Tue Jun 09 2026 mk <mk@address.com> - 1.0.0-1
 - Initial package release

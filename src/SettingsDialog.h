@@ -22,7 +22,6 @@ private:
     struct NgrokUi {
         QCheckBox* enabledCheck = nullptr;
         QLineEdit* nameEdit = nullptr;
-        QLineEdit* nickEdit = nullptr;
         QLineEdit* userEdit = nullptr;
         QLineEdit* apiEdit = nullptr;
         QCheckBox* monCheck = nullptr;
@@ -32,7 +31,6 @@ private:
     struct VpnUi {
         QCheckBox* enabledCheck = nullptr;
         QLineEdit* nameEdit = nullptr;
-        QLineEdit* nickEdit = nullptr;
         QLineEdit* userEdit = nullptr;
         QLineEdit* ipEdit = nullptr;
         QLineEdit* bridgeEdit = nullptr;
@@ -44,7 +42,6 @@ private:
     struct DirectUi {
         QCheckBox* enabledCheck = nullptr;
         QLineEdit* nameEdit = nullptr;
-        QLineEdit* nickEdit = nullptr;
         QLineEdit* userEdit = nullptr;
         QLineEdit* hostEdit = nullptr;
         QLineEdit* portEdit = nullptr;
@@ -71,5 +68,4 @@ private slots:
     void onSaveClicked();
     void onImportClicked();
     void onExportClicked();
-    void onShareClicked();
 };
