@@ -2,6 +2,7 @@
 
 #include <QString>
 #include <QVector>
+#include <QPalette>
 
 struct NgrokConfig {
     bool enabled = false;
@@ -46,6 +47,10 @@ public:
     // Configuration fields
     QString globalSshPass;
     QString sheetCsvUrl;
+    QString theme;
+    QPalette systemPalette;
+
+    void applyTheme();
 
     QVector<NgrokConfig> ngrokPcs;
     QVector<VpnConfig> vpnPcs;

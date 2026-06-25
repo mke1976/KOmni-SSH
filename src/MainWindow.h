@@ -60,7 +60,6 @@ private slots:
     void onSettingsTriggered();
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
     void handleCsvReply();
-    void onConnectCard(ComputerCardWidget* card, const QString& appChoice);
 
 private:
     void setupUi();

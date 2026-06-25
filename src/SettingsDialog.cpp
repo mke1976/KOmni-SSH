@@ -9,10 +9,11 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QClipboard>
+#include <QTabWidget>
 
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
-    setWindowTitle("Settings");
-    resize(550, 750);
+    setWindowTitle(tr("Settings"));
+    resize(550, 650);
     setupUi();
     loadSettings();
 }
@@ -23,41 +24,56 @@ void SettingsDialog::setupUi() {
     mainLayout->setSpacing(10);
 
     // Title / Header
-    QLabel* titleLabel = new QLabel("Settings", this);
+    QLabel* titleLabel = new QLabel(tr("Settings"), this);
     titleLabel->setStyleSheet("font-size: 20px; font-weight: bold; padding: 5px;");
     mainLayout->addWidget(titleLabel);
 
-    // Scroll Area
-    QScrollArea* scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setFrameShape(QFrame::NoFrame);
+    // Create Tab Widget
+    QTabWidget* tabWidget = new QTabWidget(this);
 
-    QWidget* scrollWidget = new QWidget(scrollArea);
+    // Tab 1: Connections
+    QScrollArea* connectionsScroll = new QScrollArea(tabWidget);
+    connectionsScroll->setWidgetResizable(true);
+    connectionsScroll->setFrameShape(QFrame::NoFrame);
+
+    QWidget* scrollWidget = new QWidget(connectionsScroll);
     QVBoxLayout* scrollLayout = new QVBoxLayout(scrollWidget);
     scrollLayout->setContentsMargins(0, 0, 0, 0);
     scrollLayout->setSpacing(15);
 
-    // Add sections
     scrollLayout->addWidget(createGlobalSection());
     scrollLayout->addWidget(createNgrokSection());
     scrollLayout->addWidget(createVpnSection());
     scrollLayout->addWidget(createDirectSection());
-    scrollLayout->addWidget(createImportExportSection());
 
     scrollWidget->setLayout(scrollLayout);
-    scrollArea->setWidget(scrollWidget);
-    mainLayout->addWidget(scrollArea);
+    connectionsScroll->setWidget(scrollWidget);
+    tabWidget->addTab(connectionsScroll, tr("Connections"));
+
+    // Tab 2: Appearance (KDE Look and feel style)
+    QWidget* appearanceWidget = createLookAndFeelSection();
+    tabWidget->addTab(appearanceWidget, tr("Appearance"));
+
+    // Tab 3: Backup
+    QWidget* backupWidget = new QWidget(tabWidget);
+    QVBoxLayout* backupLayout = new QVBoxLayout(backupWidget);
+    backupLayout->setContentsMargins(10, 10, 10, 10);
+    backupLayout->addWidget(createImportExportSection());
+    backupLayout->addStretch();
+    tabWidget->addTab(backupWidget, tr("Backup"));
+
+    mainLayout->addWidget(tabWidget);
 
     // Bottom Buttons (Cancel, Save)
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();
     
-    QPushButton* cancelBtn = new QPushButton("Cancel", this);
+    QPushButton* cancelBtn = new QPushButton(tr("Cancel"), this);
     cancelBtn->setStyleSheet("padding: 8px 16px; border-radius: 4px;");
     connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
     buttonLayout->addWidget(cancelBtn);
 
-    QPushButton* saveBtn = new QPushButton("Save", this);
+    QPushButton* saveBtn = new QPushButton(tr("Save"), this);
     saveBtn->setStyleSheet("padding: 8px 16px; border-radius: 4px; background-color: palette(highlight); color: palette(highlighted-text); font-weight: bold;");
     connect(saveBtn, &QPushButton::clicked, this, &SettingsDialog::onSaveClicked);
     buttonLayout->addWidget(saveBtn);
@@ -67,37 +83,37 @@ void SettingsDialog::setupUi() {
 }
 
 QWidget* SettingsDialog::createGlobalSection() {
-    QGroupBox* box = new QGroupBox("General Settings");
+    QGroupBox* box = new QGroupBox(tr("General Settings"));
     QFormLayout* form = new QFormLayout(box);
     form->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
 
     m_csvUrlEdit = new QLineEdit(box);
-    m_csvUrlEdit->setToolTip("Google Sheet URL in CSV format");
-    form->addRow("Google Sheet URL:", m_csvUrlEdit);
+    m_csvUrlEdit->setToolTip(tr("Google Sheet URL in CSV format"));
+    form->addRow(tr("Google Sheet URL:"), m_csvUrlEdit);
 
     m_sshPassEdit = new QLineEdit(box);
     m_sshPassEdit->setEchoMode(QLineEdit::Password);
-    m_sshPassEdit->setToolTip("Global SSH password if sshpass is used");
-    form->addRow("Global: Key Passphrase:", m_sshPassEdit);
+    m_sshPassEdit->setToolTip(tr("Global SSH password if sshpass is used"));
+    form->addRow(tr("Global: Key Passphrase:"), m_sshPassEdit);
 
     return box;
 }
 
 QWidget* SettingsDialog::createNgrokSection() {
-    QGroupBox* mainBox = new QGroupBox("SSH Ngrok Settings");
+    QGroupBox* mainBox = new QGroupBox(tr("SSH Ngrok Settings"));
     QVBoxLayout* layout = new QVBoxLayout(mainBox);
     layout->setSpacing(10);
 
     m_ngrokUi.resize(5);
     for (int i = 0; i < 5; ++i) {
-        QGroupBox* pcBox = new QGroupBox(QString("Computer %1").arg(i + 1), mainBox);
+        QGroupBox* pcBox = new QGroupBox(tr("Computer %1").arg(i + 1), mainBox);
         pcBox->setFlat(true);
         QVBoxLayout* pcLayout = new QVBoxLayout(pcBox);
         pcLayout->setContentsMargins(5, 5, 5, 5);
 
         // Header with Enable toggle
         QHBoxLayout* header = new QHBoxLayout();
-        QCheckBox* enableCheck = new QCheckBox("Enable Computer", pcBox);
+        QCheckBox* enableCheck = new QCheckBox(tr("Enable Computer"), pcBox);
         enableCheck->setStyleSheet("font-weight: bold;");
         header->addWidget(enableCheck);
         header->addStretch();
@@ -109,15 +125,15 @@ QWidget* SettingsDialog::createNgrokSection() {
         form->setContentsMargins(10, 5, 5, 5);
 
         QLineEdit* nameEdit = new QLineEdit(detailsWidget);
-        form->addRow("Computer Name:", nameEdit);
+        form->addRow(tr("Computer Name:"), nameEdit);
 
         QLineEdit* userEdit = new QLineEdit(detailsWidget);
-        form->addRow("User:", userEdit);
+        form->addRow(tr("User:"), userEdit);
 
         QLineEdit* apiEdit = new QLineEdit(detailsWidget);
-        form->addRow("Ngrok API Key:", apiEdit);
+        form->addRow(tr("Ngrok API Key:"), apiEdit);
 
-        QCheckBox* monCheck = new QCheckBox("Online monitor", detailsWidget);
+        QCheckBox* monCheck = new QCheckBox(tr("Online monitor"), detailsWidget);
         form->addRow("", monCheck);
 
         pcLayout->addWidget(detailsWidget);
@@ -139,19 +155,19 @@ QWidget* SettingsDialog::createNgrokSection() {
 }
 
 QWidget* SettingsDialog::createVpnSection() {
-    QGroupBox* mainBox = new QGroupBox("SSH IPv6+Wireguard (VPN) Settings");
+    QGroupBox* mainBox = new QGroupBox(tr("SSH IPv6+Wireguard (VPN) Settings"));
     QVBoxLayout* layout = new QVBoxLayout(mainBox);
     layout->setSpacing(10);
 
     m_vpnUi.resize(5);
     for (int i = 0; i < 5; ++i) {
-        QGroupBox* pcBox = new QGroupBox(QString("Computer %1").arg(i + 1), mainBox);
+        QGroupBox* pcBox = new QGroupBox(tr("Computer %1").arg(i + 1), mainBox);
         pcBox->setFlat(true);
         QVBoxLayout* pcLayout = new QVBoxLayout(pcBox);
         pcLayout->setContentsMargins(5, 5, 5, 5);
 
         QHBoxLayout* header = new QHBoxLayout();
-        QCheckBox* enableCheck = new QCheckBox("Enable Computer", pcBox);
+        QCheckBox* enableCheck = new QCheckBox(tr("Enable Computer"), pcBox);
         enableCheck->setStyleSheet("font-weight: bold;");
         header->addWidget(enableCheck);
         header->addStretch();
@@ -162,21 +178,21 @@ QWidget* SettingsDialog::createVpnSection() {
         form->setContentsMargins(10, 5, 5, 5);
 
         QLineEdit* nameEdit = new QLineEdit(detailsWidget);
-        form->addRow("Computer Name:", nameEdit);
+        form->addRow(tr("Computer Name:"), nameEdit);
 
         QLineEdit* userEdit = new QLineEdit(detailsWidget);
-        form->addRow("User:", userEdit);
+        form->addRow(tr("User:"), userEdit);
 
         QLineEdit* ipEdit = new QLineEdit(detailsWidget);
-        form->addRow("IP Address:", ipEdit);
+        form->addRow(tr("IP Address:"), ipEdit);
 
         QLineEdit* bridgeEdit = new QLineEdit(detailsWidget);
-        form->addRow("Bridge Connection (WARP):", bridgeEdit);
+        form->addRow(tr("Bridge Connection (WARP):"), bridgeEdit);
 
         QLineEdit* privEdit = new QLineEdit(detailsWidget);
-        form->addRow("Private Connection (fritz):", privEdit);
+        form->addRow(tr("Private Connection (fritz):"), privEdit);
 
-        QCheckBox* monCheck = new QCheckBox("Online monitor", detailsWidget);
+        QCheckBox* monCheck = new QCheckBox(tr("Online monitor"), detailsWidget);
         form->addRow("", monCheck);
 
         pcLayout->addWidget(detailsWidget);
@@ -198,19 +214,19 @@ QWidget* SettingsDialog::createVpnSection() {
 }
 
 QWidget* SettingsDialog::createDirectSection() {
-    QGroupBox* mainBox = new QGroupBox("SSH IPv4 (Direct) Settings");
+    QGroupBox* mainBox = new QGroupBox(tr("SSH IPv4 (Direct) Settings"));
     QVBoxLayout* layout = new QVBoxLayout(mainBox);
     layout->setSpacing(10);
 
     m_directUi.resize(5);
     for (int i = 0; i < 5; ++i) {
-        QGroupBox* pcBox = new QGroupBox(QString("Computer %1").arg(i + 1), mainBox);
+        QGroupBox* pcBox = new QGroupBox(tr("Computer %1").arg(i + 1), mainBox);
         pcBox->setFlat(true);
         QVBoxLayout* pcLayout = new QVBoxLayout(pcBox);
         pcLayout->setContentsMargins(5, 5, 5, 5);
 
         QHBoxLayout* header = new QHBoxLayout();
-        QCheckBox* enableCheck = new QCheckBox("Enable Computer", pcBox);
+        QCheckBox* enableCheck = new QCheckBox(tr("Enable Computer"), pcBox);
         enableCheck->setStyleSheet("font-weight: bold;");
         header->addWidget(enableCheck);
         header->addStretch();
@@ -221,18 +237,18 @@ QWidget* SettingsDialog::createDirectSection() {
         form->setContentsMargins(10, 5, 5, 5);
 
         QLineEdit* nameEdit = new QLineEdit(detailsWidget);
-        form->addRow("Computer Name:", nameEdit);
+        form->addRow(tr("Computer Name:"), nameEdit);
 
         QLineEdit* userEdit = new QLineEdit(detailsWidget);
-        form->addRow("User:", userEdit);
+        form->addRow(tr("User:"), userEdit);
 
         QLineEdit* hostEdit = new QLineEdit(detailsWidget);
-        form->addRow("Host / Address:", hostEdit);
+        form->addRow(tr("Host / Address:"), hostEdit);
 
         QLineEdit* portEdit = new QLineEdit(detailsWidget);
-        form->addRow("Port:", portEdit);
+        form->addRow(tr("Port:"), portEdit);
 
-        QCheckBox* monCheck = new QCheckBox("Online monitor", detailsWidget);
+        QCheckBox* monCheck = new QCheckBox(tr("Online monitor"), detailsWidget);
         form->addRow("", monCheck);
 
         pcLayout->addWidget(detailsWidget);
@@ -252,19 +268,51 @@ QWidget* SettingsDialog::createDirectSection() {
     return mainBox;
 }
 
+QWidget* SettingsDialog::createLookAndFeelSection() {
+    QWidget* container = new QWidget(this);
+    QVBoxLayout* layout = new QVBoxLayout(container);
+    layout->setContentsMargins(15, 15, 15, 15);
+    layout->setSpacing(15);
+
+    QGroupBox* themeBox = new QGroupBox(tr("Color Scheme"), container);
+    QVBoxLayout* themeLayout = new QVBoxLayout(themeBox);
+    themeLayout->setSpacing(10);
+
+    m_lightRadio = new QRadioButton(tr("Light"), themeBox);
+    m_darkRadio = new QRadioButton(tr("Dark"), themeBox);
+    m_systemRadio = new QRadioButton(tr("System (follow KDE setting)"), themeBox);
+
+    themeLayout->addWidget(m_lightRadio);
+    themeLayout->addWidget(m_darkRadio);
+    themeLayout->addWidget(m_systemRadio);
+
+    layout->addWidget(themeBox);
+    layout->addStretch();
+
+    return container;
+}
+
 QWidget* SettingsDialog::createImportExportSection() {
-    QGroupBox* box = new QGroupBox("Import / Export");
-    QHBoxLayout* layout = new QHBoxLayout(box);
+    QGroupBox* box = new QGroupBox(tr("Import / Export"));
+    QVBoxLayout* vbox = new QVBoxLayout(box);
+    vbox->setSpacing(10);
+
+    QLabel* desc = new QLabel(tr("Backup or restore your connection settings."), box);
+    desc->setStyleSheet("color: palette(placeholder-text); padding-bottom: 5px;");
+    vbox->addWidget(desc);
+
+    QHBoxLayout* layout = new QHBoxLayout();
     layout->setSpacing(10);
 
-    QPushButton* exportBtn = new QPushButton("Export", box);
+    QPushButton* exportBtn = new QPushButton(tr("Export"), box);
     connect(exportBtn, &QPushButton::clicked, this, &SettingsDialog::onExportClicked);
     layout->addWidget(exportBtn);
 
-    QPushButton* importBtn = new QPushButton("Import", box);
+    QPushButton* importBtn = new QPushButton(tr("Import"), box);
     connect(importBtn, &QPushButton::clicked, this, &SettingsDialog::onImportClicked);
     layout->addWidget(importBtn);
 
+    vbox->addLayout(layout);
     return box;
 }
 
@@ -273,6 +321,15 @@ void SettingsDialog::loadSettings() {
 
     m_csvUrlEdit->setText(config.sheetCsvUrl);
     m_sshPassEdit->setText(config.globalSshPass);
+
+    // Look and feel
+    if (config.theme == "dark") {
+        m_darkRadio->setChecked(true);
+    } else if (config.theme == "light") {
+        m_lightRadio->setChecked(true);
+    } else {
+        m_systemRadio->setChecked(true);
+    }
 
     // Ngrok
     for (int i = 0; i < 5; ++i) {
@@ -316,6 +373,17 @@ void SettingsDialog::saveSettings() {
 
     config.sheetCsvUrl = m_csvUrlEdit->text().trimmed();
     config.globalSshPass = m_sshPassEdit->text();
+
+    // Look and feel
+    if (m_darkRadio->isChecked()) {
+        config.theme = "dark";
+    } else if (m_lightRadio->isChecked()) {
+        config.theme = "light";
+    } else {
+        config.theme = "system";
+    }
+
+    config.applyTheme();
 
     // Ngrok
     for (int i = 0; i < 5; ++i) {
@@ -362,29 +430,27 @@ void SettingsDialog::onSaveClicked() {
 }
 
 void SettingsDialog::onImportClicked() {
-    QString path = QFileDialog::getOpenFileName(this, "Import Configuration", "", "Configuration Files (*.conf);;All Files (*)");
+    QString path = QFileDialog::getOpenFileName(this, tr("Import Configuration"), "", tr("Configuration Files (*.conf);;All Files (*)"));
     if (!path.isEmpty()) {
         try {
             ConfigManager::instance().importConfig(path);
             loadSettings(); // refresh UI
-            QMessageBox::information(this, "Success", "Configuration imported successfully!");
+            QMessageBox::information(this, tr("Success"), tr("Configuration imported successfully!"));
         } catch (...) {
-            QMessageBox::critical(this, "Error", "Failed to import configuration.");
+            QMessageBox::critical(this, tr("Error"), tr("Failed to import configuration."));
         }
     }
 }
 
 void SettingsDialog::onExportClicked() {
-    QString path = QFileDialog::getSaveFileName(this, "Export Configuration", "omni-ssh.conf", "Configuration Files (*.conf);;All Files (*)");
+    QString path = QFileDialog::getSaveFileName(this, tr("Export Configuration"), tr("omni-ssh.conf"), tr("Configuration Files (*.conf);;All Files (*)"));
     if (!path.isEmpty()) {
         try {
             saveSettings(); // save current UI values to config manager
             ConfigManager::instance().exportConfig(path);
-            QMessageBox::information(this, "Success", "Configuration exported successfully!");
+            QMessageBox::information(this, tr("Success"), tr("Configuration exported successfully!"));
         } catch (...) {
-            QMessageBox::critical(this, "Error", "Failed to export configuration.");
+            QMessageBox::critical(this, tr("Error"), tr("Failed to export configuration."));
         }
     }
 }
-
-

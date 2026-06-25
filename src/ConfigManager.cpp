@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QMap>
 #include <QDebug>
+#include <QApplication>
 
 ConfigManager& ConfigManager::instance() {
     static ConfigManager inst;
@@ -46,6 +47,7 @@ void ConfigManager::exportConfig(const QString& path) {
 void ConfigManager::initDefaults() {
     globalSshPass.clear();
     sheetCsvUrl = "https://docs.google.com/spreadsheets/d/1n3QWceMh5V1npxnWZv8Z25BHoqJCuv_lVu26dbqabDM/export?format=csv";
+    theme = "system";
 
     ngrokPcs.clear();
     ngrokPcs.resize(5);
@@ -118,6 +120,7 @@ void ConfigManager::loadFromFile(const QString& path) {
 
     if (keyValues.contains("GLOBAL_SSH_PASS")) globalSshPass = keyValues["GLOBAL_SSH_PASS"];
     if (keyValues.contains("SHEET_CSV_URL")) sheetCsvUrl = keyValues["SHEET_CSV_URL"];
+    if (keyValues.contains("THEME")) theme = keyValues["THEME"];
 
     // Ngrok (N1 to N5)
     for (int i = 0; i < 5; ++i) {
@@ -168,6 +171,7 @@ void ConfigManager::saveToFile(const QString& path) {
     QTextStream out(&file);
     out << "GLOBAL_SSH_PASS=\"" << globalSshPass << "\"\n";
     out << "SHEET_CSV_URL=\"" << sheetCsvUrl << "\"\n";
+    out << "THEME=\"" << theme << "\"\n";
 
     // Ngrok
     for (int i = 0; i < 5; ++i) {
@@ -206,4 +210,50 @@ void ConfigManager::saveToFile(const QString& path) {
     }
 
     file.close();
+}
+
+void ConfigManager::applyTheme() {
+    if (theme == "dark") {
+        QPalette darkPalette;
+        darkPalette.setColor(QPalette::Window, QColor(45, 45, 45));
+        darkPalette.setColor(QPalette::WindowText, Qt::white);
+        darkPalette.setColor(QPalette::Base, QColor(30, 30, 30));
+        darkPalette.setColor(QPalette::AlternateBase, QColor(45, 45, 45));
+        darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
+        darkPalette.setColor(QPalette::ToolTipText, Qt::white);
+        darkPalette.setColor(QPalette::Text, Qt::white);
+        darkPalette.setColor(QPalette::Button, QColor(45, 45, 45));
+        darkPalette.setColor(QPalette::ButtonText, Qt::white);
+        darkPalette.setColor(QPalette::BrightText, Qt::red);
+        darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
+        darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+        darkPalette.setColor(QPalette::HighlightedText, Qt::white);
+        darkPalette.setColor(QPalette::Light, QColor(60, 60, 60));
+        darkPalette.setColor(QPalette::Mid, QColor(80, 80, 80));
+        darkPalette.setColor(QPalette::Dark, QColor(20, 20, 20));
+        darkPalette.setColor(QPalette::PlaceholderText, QColor(150, 150, 150));
+        qApp->setPalette(darkPalette);
+    } else if (theme == "light") {
+        QPalette lightPalette;
+        lightPalette.setColor(QPalette::Window, QColor(240, 240, 240));
+        lightPalette.setColor(QPalette::WindowText, Qt::black);
+        lightPalette.setColor(QPalette::Base, Qt::white);
+        lightPalette.setColor(QPalette::AlternateBase, QColor(240, 240, 240));
+        lightPalette.setColor(QPalette::ToolTipBase, Qt::black);
+        lightPalette.setColor(QPalette::ToolTipText, Qt::black);
+        lightPalette.setColor(QPalette::Text, Qt::black);
+        lightPalette.setColor(QPalette::Button, QColor(240, 240, 240));
+        lightPalette.setColor(QPalette::ButtonText, Qt::black);
+        lightPalette.setColor(QPalette::BrightText, Qt::red);
+        lightPalette.setColor(QPalette::Link, QColor(0, 120, 215));
+        lightPalette.setColor(QPalette::Highlight, QColor(0, 120, 215));
+        lightPalette.setColor(QPalette::HighlightedText, Qt::white);
+        lightPalette.setColor(QPalette::Light, QColor(255, 255, 255));
+        lightPalette.setColor(QPalette::Mid, QColor(200, 200, 200));
+        lightPalette.setColor(QPalette::Dark, QColor(160, 160, 160));
+        lightPalette.setColor(QPalette::PlaceholderText, QColor(100, 100, 100));
+        qApp->setPalette(lightPalette);
+    } else {
+        qApp->setPalette(systemPalette);
+    }
 }

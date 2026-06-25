@@ -5,6 +5,7 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include <QVector>
+#include <QRadioButton>
 #include "ConfigManager.h"
 
 class SettingsDialog : public QDialog {
@@ -53,6 +54,11 @@ private:
     QLineEdit* m_sshPassEdit = nullptr;
     QLineEdit* m_csvUrlEdit = nullptr;
 
+    // Look & Feel edits
+    QRadioButton* m_lightRadio = nullptr;
+    QRadioButton* m_darkRadio = nullptr;
+    QRadioButton* m_systemRadio = nullptr;
+
     QVector<NgrokUi> m_ngrokUi;
     QVector<VpnUi> m_vpnUi;
     QVector<DirectUi> m_directUi;
@@ -62,6 +68,7 @@ private:
     QWidget* createNgrokSection();
     QWidget* createVpnSection();
     QWidget* createDirectSection();
+    QWidget* createLookAndFeelSection();
     QWidget* createImportExportSection();
 
 private slots:

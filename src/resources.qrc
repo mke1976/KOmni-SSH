@@ -2,4 +2,9 @@
 <qresource>
     <file>icons/app_icon.png</file>
 </qresource>
+<qresource prefix="/translations">
+    <file>translations/komni-ssh_de.qm</file>
+    <file>translations/komni-ssh_fr.qm</file>
+    <file>translations/komni-ssh_zh.qm</file>
+</qresource>
 </RCC>

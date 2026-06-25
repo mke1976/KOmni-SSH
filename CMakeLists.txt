@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
-project(komni-ssh VERSION 1.0.1 LANGUAGES CXX)
+project(komni-ssh VERSION 1.0.3 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_compile_options(-Wall -Wextra -Wpedantic)
 
 # Find Qt 6 libraries
 find_package(Qt6 REQUIRED COMPONENTS Widgets Network)

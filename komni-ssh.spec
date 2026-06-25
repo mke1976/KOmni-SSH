@@ -1,5 +1,5 @@
 Name:           komni-ssh
-Version:        1.0.1
+Version:        1.0.3
 Release:        1%{?dist}
 Summary:        KDE native SSH connection and remote status monitor
 
@@ -45,6 +45,16 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/pixmaps/%{name}.png
 
 %changelog
+* Fri Jun 26 2026 mk <mk@address.com> - 1.0.3-1
+- Fix system language settings detection to support KDE Plasma locale and environment variables fallback
+- Fix all compiler warnings (unused variables/parameters, unused slot function)
+- Add proper comments and explanations in the code
+
+* Fri Jun 19 2026 mk <mk@address.com> - 1.0.2-1
+- Implement tabbed settings menu (Connections, Appearance, Backup)
+- Implement dark mode with Light / Dark / System (follow KDE) selection
+- Add i18n support: English, German, French, Chinese (follows system locale)
+
 * Mon Jun 15 2026 mk <mk@address.com> - 1.0.1-1
 - Remove CB Nickname field from settings
 - Remove Settings Share button

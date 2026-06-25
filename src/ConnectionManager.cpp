@@ -18,12 +18,12 @@ ConnectionManager::ConnectionManager() : QObject(nullptr) {
 
 void ConnectionManager::connectNgrok(const NgrokConfig& pc, const QString& appChoice, QWidget* parent) {
     if (pc.api.isEmpty()) {
-        QMessageBox::warning(parent, "Ngrok Error", "Ngrok API Key is empty!");
+        QMessageBox::warning(parent, tr("Ngrok Error"), tr("Ngrok API Key is empty!"));
         return;
     }
 
-    QProgressDialog* progress = new QProgressDialog("Querying Ngrok API for tunnels...", "Cancel", 0, 0, parent);
-    progress->setWindowTitle("Ngrok Resolution");
+    QProgressDialog* progress = new QProgressDialog(tr("Querying Ngrok API for tunnels..."), tr("Cancel"), 0, 0, parent);
+    progress->setWindowTitle(tr("Ngrok Resolution"));
     progress->setWindowModality(Qt::WindowModal);
     progress->show();
 
@@ -38,7 +38,7 @@ void ConnectionManager::connectNgrok(const NgrokConfig& pc, const QString& appCh
         progress->deleteLater();
 
         if (reply->error() != QNetworkReply::NoError) {
-            QMessageBox::critical(parent, "Ngrok Error", QString("Failed to query Ngrok API:\n%1").arg(reply->errorString()));
+            QMessageBox::critical(parent, tr("Ngrok Error"), tr("Failed to query Ngrok API:\n%1").arg(reply->errorString()));
             reply->deleteLater();
             return;
         }
@@ -48,7 +48,7 @@ void ConnectionManager::connectNgrok(const NgrokConfig& pc, const QString& appCh
 
         QJsonDocument doc = QJsonDocument::fromJson(data);
         if (doc.isNull() || !doc.isObject()) {
-            QMessageBox::critical(parent, "Ngrok Error", "Invalid JSON response from Ngrok API.");
+            QMessageBox::critical(parent, tr("Ngrok Error"), tr("Invalid JSON response from Ngrok API."));
             return;
         }
 
@@ -65,7 +65,7 @@ void ConnectionManager::connectNgrok(const NgrokConfig& pc, const QString& appCh
         }
 
         if (publicUrl.isEmpty()) {
-            QMessageBox::critical(parent, "Ngrok Error", "No active TCP tunnels found in your Ngrok account.");
+            QMessageBox::critical(parent, tr("Ngrok Error"), tr("No active TCP tunnels found in your Ngrok account."));
             return;
         }
 
@@ -73,7 +73,7 @@ void ConnectionManager::connectNgrok(const NgrokConfig& pc, const QString& appCh
         QString addr = publicUrl.mid(6); // remove tcp://
         int colonIdx = addr.lastIndexOf(':');
         if (colonIdx == -1) {
-            QMessageBox::critical(parent, "Ngrok Error", QString("Invalid tunnel URL: %1").arg(publicUrl));
+            QMessageBox::critical(parent, tr("Ngrok Error"), tr("Invalid tunnel URL: %1").arg(publicUrl));
             return;
         }
 
@@ -91,7 +91,7 @@ void ConnectionManager::connectNgrok(const NgrokConfig& pc, const QString& appCh
 
 void ConnectionManager::connectDirect(const DirectConfig& pc, const QString& appChoice, QWidget* parent) {
     if (pc.host.isEmpty()) {
-        QMessageBox::warning(parent, "Direct SSH Error", "Host address is empty!");
+        QMessageBox::warning(parent, tr("Direct SSH Error"), tr("Host address is empty!"));
         return;
     }
 
@@ -106,8 +106,8 @@ void ConnectionManager::connectVpn(const VpnConfig& pc, const QString& appChoice
     VpnState* state = new VpnState;
     state->pc = pc;
     state->appChoice = appChoice;
-    state->progress = new QProgressDialog("Initializing Double VPN...", "Cancel", 0, 100, parent);
-    state->progress->setWindowTitle("Double VPN Sequence");
+    state->progress = new QProgressDialog(tr("Initializing Double VPN..."), tr("Cancel"), 0, 100, parent);
+    state->progress->setWindowTitle(tr("Double VPN Sequence"));
     state->progress->setWindowModality(Qt::WindowModal);
     state->progress->setValue(10);
     state->progress->show();
@@ -123,7 +123,7 @@ void ConnectionManager::connectVpn(const VpnConfig& pc, const QString& appChoice
 void ConnectionManager::checkIpv6(VpnState* state) {
     if (!state->progress || state->progress->wasCanceled()) return;
 
-    state->progress->setLabelText("Checking IPv6 connectivity...");
+    state->progress->setLabelText(tr("Checking IPv6 connectivity..."));
     state->progress->setValue(15);
 
     state->proc = new QProcess(this);
@@ -135,7 +135,7 @@ void ConnectionManager::checkIpv6(VpnState* state) {
         if (exitCode == 0) {
             state->hasNativeIpv6 = true;
             if (state->progress) {
-                state->progress->setLabelText("Native IPv6 detected! Skipping Bridge...");
+                state->progress->setLabelText(tr("Native IPv6 detected! Skipping Bridge..."));
                 state->progress->setValue(30);
             }
             state->attempt = 1;
@@ -152,18 +152,18 @@ void ConnectionManager::connectBridge(VpnState* state) {
     if (!state->progress || state->progress->wasCanceled()) return;
 
     if (state->attempt > 3) {
-        QMessageBox::critical(state->progress->parentWidget(), "VPN Error", 
-                              QString("Failed to connect Bridge: %1 after 3 attempts.").arg(state->pc.bridge));
+        QMessageBox::critical(state->progress->parentWidget(), tr("VPN Error"), 
+                              tr("Failed to connect Bridge: %1 after 3 attempts.").arg(state->pc.bridge));
         cleanupVpnState(state, false);
         return;
     }
 
-    state->progress->setLabelText(QString("Connecting Bridge: %1 (Attempt %2/3)...").arg(state->pc.bridge).arg(state->attempt));
+    state->progress->setLabelText(tr("Connecting Bridge: %1 (Attempt %2/3)...").arg(state->pc.bridge).arg(state->attempt));
     state->progress->setValue(30 + (state->attempt - 1) * 5);
 
     state->proc = new QProcess(this);
     state->proc->start("nmcli", QStringList() << "connection" << "up" << state->pc.bridge);
-    connect(state->proc, &QProcess::finished, this, [this, state](int exitCode) {
+    connect(state->proc, &QProcess::finished, this, [this, state](int /*exitCode*/) {
         state->proc->deleteLater();
         state->proc = nullptr;
 
@@ -174,7 +174,7 @@ void ConnectionManager::connectBridge(VpnState* state) {
             pingProc->deleteLater();
             if (pingExitCode == 0) {
                 if (state->progress) {
-                    state->progress->setLabelText("Bridge Connected!");
+                    state->progress->setLabelText(tr("Bridge Connected!"));
                     state->progress->setValue(45);
                 }
                 state->attempt = 1;
@@ -191,18 +191,18 @@ void ConnectionManager::connectPrivate(VpnState* state) {
     if (!state->progress || state->progress->wasCanceled()) return;
 
     if (state->attempt > 3) {
-        QMessageBox::critical(state->progress->parentWidget(), "VPN Error", 
-                              QString("Failed to connect Private VPN: %1 after 3 attempts.").arg(state->pc.priv));
+        QMessageBox::critical(state->progress->parentWidget(), tr("VPN Error"), 
+                              tr("Failed to connect Private VPN: %1 after 3 attempts.").arg(state->pc.priv));
         cleanupVpnState(state, false);
         return;
     }
 
-    state->progress->setLabelText(QString("Connecting Private: %1 (Attempt %2/3)...").arg(state->pc.priv).arg(state->attempt));
+    state->progress->setLabelText(tr("Connecting Private: %1 (Attempt %2/3)...").arg(state->pc.priv).arg(state->attempt));
     state->progress->setValue(50 + (state->attempt - 1) * 15);
 
     state->proc = new QProcess(this);
     state->proc->start("nmcli", QStringList() << "connection" << "up" << state->pc.priv);
-    connect(state->proc, &QProcess::finished, this, [this, state](int exitCode) {
+    connect(state->proc, &QProcess::finished, this, [this, state](int /*exitCode*/) {
         state->proc->deleteLater();
         state->proc = nullptr;
 
@@ -213,7 +213,7 @@ void ConnectionManager::connectPrivate(VpnState* state) {
             pingProc->deleteLater();
             if (pingExitCode == 0) {
                 if (state->progress) {
-                    state->progress->setLabelText("Private VPN Connected! Tunnel Active!");
+                    state->progress->setLabelText(tr("Private VPN Connected! Tunnel Active!"));
                     state->progress->setValue(100);
                 }
                 
@@ -288,7 +288,6 @@ void ConnectionManager::launchSsh(const QString& target, const QStringList& sshO
     } else {
         // GUI Apps: Firefox, Dolphin, KWrite
         // Format: [sshpass -P pass -p <pass>] waypipe -c lz4 --no-gpu ssh <opts> [port-forwarding-for-pulse-if-firefox] <target> <command>
-        int cmdStart = 0;
         if (useSshPass) {
             program = "sshpass";
             args << "-P" << "pass" << "-p" << globalPass;
@@ -318,7 +317,7 @@ void ConnectionManager::launchSsh(const QString& target, const QStringList& sshO
 
     // If it's a VPN, we must disconnect when the application finishes.
     if (isVpn) {
-        connect(proc, &QProcess::finished, this, [bridgeConn, privConn](int exitCode) {
+        connect(proc, &QProcess::finished, this, [bridgeConn, privConn](int /*exitCode*/) {
             qDebug() << "Application process finished. Tearing down VPN tunnels...";
             QProcess::execute("nmcli", QStringList() << "connection" << "down" << privConn);
             if (!bridgeConn.isEmpty()) {

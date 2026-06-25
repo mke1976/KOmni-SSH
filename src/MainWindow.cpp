@@ -54,16 +54,16 @@ ComputerCardWidget::ComputerCardWidget(const QString& name, const QString& nickn
 
     QString typeStr;
     switch (m_type) {
-        case Ngrok:  typeStr = "Ngrok Connection"; break;
-        case Vpn:    typeStr = "Double VPN Connection"; break;
-        case Direct: typeStr = "Direct Connection"; break;
+        case Ngrok:  typeStr = tr("Ngrok Connection"); break;
+        case Vpn:    typeStr = tr("Double VPN Connection"); break;
+        case Direct: typeStr = tr("Direct Connection"); break;
     }
 
     m_typeLabel = new QLabel(QString("%1 | %2").arg(typeStr).arg(details), this);
     m_typeLabel->setStyleSheet("font-size: 11px; color: palette(placeholder-text);");
     detailsLayout->addWidget(m_typeLabel);
 
-    m_statusTextLabel = new QLabel("No status data available", this);
+    m_statusTextLabel = new QLabel(tr("No status data available"), this);
     m_statusTextLabel->setStyleSheet("font-size: 11px; color: palette(placeholder-text);");
     detailsLayout->addWidget(m_statusTextLabel);
 
@@ -71,7 +71,7 @@ ComputerCardWidget::ComputerCardWidget(const QString& name, const QString& nickn
     layout->addStretch();
 
     // Right Layout (Status button/pill)
-    m_statusButton = new QPushButton("UNKNOWN", this);
+    m_statusButton = new QPushButton(tr("UNKNOWN"), this);
     m_statusButton->setFixedWidth(90);
     setUnknownStatus();
     layout->addWidget(m_statusButton);
@@ -82,16 +82,16 @@ ComputerCardWidget::ComputerCardWidget(const QString& name, const QString& nickn
 void ComputerCardWidget::setupMenu() {
     QMenu* menu = new QMenu(m_statusButton);
     
-    QAction* termAct = menu->addAction("Terminal (SSH)");
+    QAction* termAct = menu->addAction(tr("Terminal (SSH)"));
     connect(termAct, &QAction::triggered, this, [this]() { emit connectRequested("Terminal"); });
 
-    QAction* ffAct = menu->addAction("Firefox (GUI)");
+    QAction* ffAct = menu->addAction(tr("Firefox (GUI)"));
     connect(ffAct, &QAction::triggered, this, [this]() { emit connectRequested("Firefox"); });
 
-    QAction* dolAct = menu->addAction("Dolphin (GUI)");
+    QAction* dolAct = menu->addAction(tr("Dolphin (GUI)"));
     connect(dolAct, &QAction::triggered, this, [this]() { emit connectRequested("Dolphin"); });
 
-    QAction* kwAct = menu->addAction("KWrite (GUI)");
+    QAction* kwAct = menu->addAction(tr("KWrite (GUI)"));
     connect(kwAct, &QAction::triggered, this, [this]() { emit connectRequested("KWrite"); });
 
     m_statusButton->setMenu(menu);
@@ -102,9 +102,9 @@ void ComputerCardWidget::setupMenu() {
 void ComputerCardWidget::updateStatus(bool online, qint64 timestamp) {
     QString timeStr = QDateTime::fromSecsSinceEpoch(timestamp).toString("yyyy-MM-dd hh:mm:ss");
     if (online) {
-        m_statusTextLabel->setText(QString("Online | Updated: %1").arg(timeStr));
+        m_statusTextLabel->setText(tr("Online | Updated: %1").arg(timeStr));
         m_statusTextLabel->setStyleSheet("font-size: 11px; color: #27ae60; font-weight: bold;");
-        m_statusButton->setText("ONLINE");
+        m_statusButton->setText(tr("ONLINE"));
         m_statusButton->setStyleSheet(
             "QPushButton {"
             "    background-color: #2ecc71;"
@@ -118,9 +118,9 @@ void ComputerCardWidget::updateStatus(bool online, qint64 timestamp) {
             "QPushButton::menu-indicator { image: none; }"
         );
     } else {
-        m_statusTextLabel->setText(QString("Offline | Last seen: %1").arg(timeStr));
+        m_statusTextLabel->setText(tr("Offline | Last seen: %1").arg(timeStr));
         m_statusTextLabel->setStyleSheet("font-size: 11px; color: #c0392b;");
-        m_statusButton->setText("OFFLINE");
+        m_statusButton->setText(tr("OFFLINE"));
         m_statusButton->setStyleSheet(
             "QPushButton {"
             "    background-color: #e74c3c;"
@@ -137,9 +137,9 @@ void ComputerCardWidget::updateStatus(bool online, qint64 timestamp) {
 }
 
 void ComputerCardWidget::setUnknownStatus() {
-    m_statusTextLabel->setText("No status data available");
+    m_statusTextLabel->setText(tr("No status data available"));
     m_statusTextLabel->setStyleSheet("font-size: 11px; color: palette(placeholder-text);");
-    m_statusButton->setText("UNKNOWN");
+    m_statusButton->setText(tr("UNKNOWN"));
     m_statusButton->setStyleSheet(
         "QPushButton {"
         "    background-color: #95a5a6;"
@@ -158,7 +158,7 @@ void ComputerCardWidget::setUnknownStatus() {
 // MainWindow Implementation
 // -----------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
-    setWindowTitle("KOmni-SSH status");
+    setWindowTitle(tr("KOmni-SSH status"));
     resize(500, 600);
     setWindowIcon(QIcon(":/icons/app_icon.png"));
 
@@ -172,8 +172,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
 void MainWindow::setupUi() {
     QMenuBar* m_menuBar = menuBar();
-    QMenu* settingsMenu = m_menuBar->addMenu("Settings");
-    QAction* configureAct = new QAction(QIcon::fromTheme("configure", style()->standardIcon(QStyle::SP_FileDialogListView)), "Configure KOmni-SSH...", this);
+    QMenu* settingsMenu = m_menuBar->addMenu(tr("Settings"));
+    QAction* configureAct = new QAction(QIcon::fromTheme("configure", style()->standardIcon(QStyle::SP_FileDialogListView)), tr("Configure KOmni-SSH..."), this);
     connect(configureAct, &QAction::triggered, this, &MainWindow::onSettingsTriggered);
     settingsMenu->addAction(configureAct);
 
@@ -188,17 +188,17 @@ void MainWindow::setupUi() {
     toolbar->setMovable(false);
     toolbar->setStyleSheet("QToolBar { background: transparent; border: none; }");
     
-    QAction* refreshAct = new QAction(style()->standardIcon(QStyle::SP_BrowserReload), "Refresh", this);
+    QAction* refreshAct = new QAction(style()->standardIcon(QStyle::SP_BrowserReload), tr("Refresh"), this);
     connect(refreshAct, &QAction::triggered, this, &MainWindow::onRefreshTriggered);
     toolbar->addAction(refreshAct);
 
-    QAction* settingsAct = new QAction(QIcon::fromTheme("configure", style()->standardIcon(QStyle::SP_FileDialogListView)), "Configure KOmni-SSH...", this);
+    QAction* settingsAct = new QAction(QIcon::fromTheme("configure", style()->standardIcon(QStyle::SP_FileDialogListView)), tr("Configure KOmni-SSH..."), this);
     connect(settingsAct, &QAction::triggered, this, &MainWindow::onSettingsTriggered);
     toolbar->addAction(settingsAct);
 
     toolbar->addSeparator();
 
-    QAction* quitAct = new QAction(style()->standardIcon(QStyle::SP_DialogCloseButton), "Quit", this);
+    QAction* quitAct = new QAction(style()->standardIcon(QStyle::SP_DialogCloseButton), tr("Quit"), this);
     connect(quitAct, &QAction::triggered, qApp, &QApplication::quit);
     toolbar->addAction(quitAct);
 
@@ -219,7 +219,7 @@ void MainWindow::setupUi() {
     mainLayout->addWidget(m_scrollArea);
 
     // Status footer (Last updated)
-    m_lastRefreshedLabel = new QLabel("Last Refresh: Never", this);
+    m_lastRefreshedLabel = new QLabel(tr("Last Refresh: Never"), this);
     m_lastRefreshedLabel->setStyleSheet("font-size: 10px; color: palette(placeholder-text); padding: 2px;");
     mainLayout->addWidget(m_lastRefreshedLabel);
 
@@ -229,21 +229,21 @@ void MainWindow::setupUi() {
 void MainWindow::setupTrayIcon() {
     m_trayIcon = new QSystemTrayIcon(this);
     m_trayIcon->setIcon(QIcon(":/icons/app_icon.png"));
-    m_trayIcon->setToolTip("KOmni-SSH Status Monitor");
+    m_trayIcon->setToolTip(tr("KOmni-SSH Status Monitor"));
 
     QMenu* trayMenu = new QMenu(this);
-    QAction* showAct = trayMenu->addAction("Show MainWindow");
+    QAction* showAct = trayMenu->addAction(tr("Show MainWindow"));
     connect(showAct, &QAction::triggered, this, &MainWindow::showNormal);
 
-    QAction* refreshAct = trayMenu->addAction("Refresh Status");
+    QAction* refreshAct = trayMenu->addAction(tr("Refresh Status"));
     connect(refreshAct, &QAction::triggered, this, &MainWindow::onRefreshTriggered);
 
-    QAction* settingsAct = new QAction(QIcon::fromTheme("configure", style()->standardIcon(QStyle::SP_FileDialogListView)), "Configure KOmni-SSH...", this);
+    QAction* settingsAct = new QAction(QIcon::fromTheme("configure", style()->standardIcon(QStyle::SP_FileDialogListView)), tr("Configure KOmni-SSH..."), this);
     connect(settingsAct, &QAction::triggered, this, &MainWindow::onSettingsTriggered);
     trayMenu->addAction(settingsAct);
 
     trayMenu->addSeparator();
-    QAction* quitAct = trayMenu->addAction("Quit");
+    QAction* quitAct = trayMenu->addAction(tr("Quit"));
     connect(quitAct, &QAction::triggered, qApp, &QApplication::quit);
 
     m_trayIcon->setContextMenu(trayMenu);
@@ -263,7 +263,7 @@ void MainWindow::rebuildCards() {
     for (int i = 0; i < 5; ++i) {
         const auto& pc = config.ngrokPcs[i];
         if (pc.enabled) {
-            ComputerCardWidget* card = new ComputerCardWidget(pc.name, pc.nickname, ComputerCardWidget::Ngrok, "Ngrok", m_scrollWidget);
+            ComputerCardWidget* card = new ComputerCardWidget(pc.name, pc.nickname, ComputerCardWidget::Ngrok, tr("Ngrok"), m_scrollWidget);
             m_cardsLayout->addWidget(card);
             m_cardWidgets.append(card);
             connect(card, &ComputerCardWidget::connectRequested, this, [this, card, pc](const QString& app) {
@@ -300,7 +300,7 @@ void MainWindow::rebuildCards() {
 
     // Empty state placeholder
     if (m_cardWidgets.isEmpty()) {
-        QLabel* emptyLabel = new QLabel("No computers enabled. Go to Settings to configure.", m_scrollWidget);
+        QLabel* emptyLabel = new QLabel(tr("No computers enabled. Go to Settings to configure."), m_scrollWidget);
         emptyLabel->setAlignment(Qt::AlignCenter);
         emptyLabel->setStyleSheet("color: palette(placeholder-text); padding: 50px; font-style: italic;");
         m_cardsLayout->addWidget(emptyLabel);
@@ -322,11 +322,11 @@ void MainWindow::startPolling() {
 void MainWindow::onRefreshTriggered() {
     QString urlStr = ConfigManager::instance().sheetCsvUrl;
     if (urlStr.isEmpty()) {
-        m_lastRefreshedLabel->setText("Last Refresh: Fail (No Sheets URL set)");
+        m_lastRefreshedLabel->setText(tr("Last Refresh: Fail (No Sheets URL set)"));
         return;
     }
 
-    m_lastRefreshedLabel->setText("Refreshing remote computer status...");
+    m_lastRefreshedLabel->setText(tr("Refreshing remote computer status..."));
     QUrl url(urlStr);
     QNetworkRequest request(url);
     QNetworkReply* reply = m_networkManager.get(request);
@@ -338,7 +338,7 @@ void MainWindow::handleCsvReply() {
     if (!reply) return;
 
     if (reply->error() != QNetworkReply::NoError) {
-        m_lastRefreshedLabel->setText(QString("Last Refresh: Fail (%1)").arg(reply->errorString()));
+        m_lastRefreshedLabel->setText(tr("Last Refresh: Fail (%1)").arg(reply->errorString()));
         reply->deleteLater();
         return;
     }
@@ -350,7 +350,7 @@ void MainWindow::handleCsvReply() {
     checkStatusChanges();
 
     QString timeStr = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    m_lastRefreshedLabel->setText(QString("Last Refresh: %1 (Success)").arg(timeStr));
+    m_lastRefreshedLabel->setText(tr("Last Refresh: %1 (Success)").arg(timeStr));
 }
 
 void MainWindow::parseCsvData(const QByteArray& data) {
@@ -419,8 +419,8 @@ void MainWindow::checkStatusChanges() {
 
                 if (isMonitored && !m_firstRun) {
                     m_trayIcon->showMessage(
-                        "Computer Online",
-                        QString("%1 is now ONLINE").arg(card->name()),
+                        tr("Computer Online"),
+                        tr("%1 is now ONLINE").arg(card->name()),
                         m_trayIcon->icon(), // use custom ic_launcher-playstore app icon
                         7000
                     );
@@ -471,8 +471,4 @@ void MainWindow::changeEvent(QEvent* event) {
         }
     }
     QMainWindow::changeEvent(event);
-}
-
-void MainWindow::onConnectCard(ComputerCardWidget* card, const QString& appChoice) {
-    // Handled dynamically via lambdas in rebuildCards
 }
