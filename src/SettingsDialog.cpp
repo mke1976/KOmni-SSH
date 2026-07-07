@@ -287,6 +287,15 @@ QWidget* SettingsDialog::createLookAndFeelSection() {
     themeLayout->addWidget(m_systemRadio);
 
     layout->addWidget(themeBox);
+
+    QGroupBox* behaviorBox = new QGroupBox(tr("Behavior"), container);
+    QVBoxLayout* behaviorLayout = new QVBoxLayout(behaviorBox);
+    behaviorLayout->setSpacing(10);
+
+    m_startMinimizedCheck = new QCheckBox(tr("Start minimized"), behaviorBox);
+    behaviorLayout->addWidget(m_startMinimizedCheck);
+
+    layout->addWidget(behaviorBox);
     layout->addStretch();
 
     return container;
@@ -330,6 +339,8 @@ void SettingsDialog::loadSettings() {
     } else {
         m_systemRadio->setChecked(true);
     }
+
+    m_startMinimizedCheck->setChecked(config.startMinimized);
 
     // Ngrok
     for (int i = 0; i < 5; ++i) {
@@ -382,6 +393,8 @@ void SettingsDialog::saveSettings() {
     } else {
         config.theme = "system";
     }
+
+    config.startMinimized = m_startMinimizedCheck->isChecked();
 
     config.applyTheme();
 

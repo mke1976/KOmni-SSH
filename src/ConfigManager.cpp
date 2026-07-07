@@ -48,6 +48,9 @@ void ConfigManager::initDefaults() {
     globalSshPass.clear();
     sheetCsvUrl = "https://docs.google.com/spreadsheets/d/1n3QWceMh5V1npxnWZv8Z25BHoqJCuv_lVu26dbqabDM/export?format=csv";
     theme = "system";
+    startMinimized = false;
+    windowWidth = 500;
+    windowHeight = 600;
 
     ngrokPcs.clear();
     ngrokPcs.resize(5);
@@ -121,6 +124,17 @@ void ConfigManager::loadFromFile(const QString& path) {
     if (keyValues.contains("GLOBAL_SSH_PASS")) globalSshPass = keyValues["GLOBAL_SSH_PASS"];
     if (keyValues.contains("SHEET_CSV_URL")) sheetCsvUrl = keyValues["SHEET_CSV_URL"];
     if (keyValues.contains("THEME")) theme = keyValues["THEME"];
+    if (keyValues.contains("START_MINIMIZED")) startMinimized = (keyValues["START_MINIMIZED"] == "ON");
+    if (keyValues.contains("WINDOW_WIDTH")) {
+        bool ok;
+        int w = keyValues["WINDOW_WIDTH"].toInt(&ok);
+        if (ok) windowWidth = w;
+    }
+    if (keyValues.contains("WINDOW_HEIGHT")) {
+        bool ok;
+        int h = keyValues["WINDOW_HEIGHT"].toInt(&ok);
+        if (ok) windowHeight = h;
+    }
 
     // Ngrok (N1 to N5)
     for (int i = 0; i < 5; ++i) {
@@ -172,6 +186,9 @@ void ConfigManager::saveToFile(const QString& path) {
     out << "GLOBAL_SSH_PASS=\"" << globalSshPass << "\"\n";
     out << "SHEET_CSV_URL=\"" << sheetCsvUrl << "\"\n";
     out << "THEME=\"" << theme << "\"\n";
+    out << "START_MINIMIZED=\"" << (startMinimized ? "ON" : "OFF") << "\"\n";
+    out << "WINDOW_WIDTH=\"" << windowWidth << "\"\n";
+    out << "WINDOW_HEIGHT=\"" << windowHeight << "\"\n";
 
     // Ngrok
     for (int i = 0; i < 5; ++i) {

@@ -1,6 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file>icons/app_icon.png</file>
+    <file>icons/app_icon_transparent.png</file>
+    <file>icons/app_icon_transparent_red_dot.png</file>
 </qresource>
 <qresource prefix="/translations">
     <file>translations/komni-ssh_de.qm</file>

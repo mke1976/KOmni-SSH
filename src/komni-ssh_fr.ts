@@ -238,6 +238,14 @@
         <translation>Système (suivre le paramètre KDE)</translation>
     </message>
     <message>
+        <source>Behavior</source>
+        <translation>Comportement</translation>
+    </message>
+    <message>
+        <source>Start minimized</source>
+        <translation>Démarrer minimisé</translation>
+    </message>
+    <message>
         <source>Import / Export</source>
         <translation>Importer / Exporter</translation>
     </message>

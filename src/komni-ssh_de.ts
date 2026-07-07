@@ -238,6 +238,14 @@
         <translation>System (KDE-Einstellung folgen)</translation>
     </message>
     <message>
+        <source>Behavior</source>
+        <translation>Verhalten</translation>
+    </message>
+    <message>
+        <source>Start minimized</source>
+        <translation>Minimiert starten</translation>
+    </message>
+    <message>
         <source>Import / Export</source>
         <translation>Importieren / Exportieren</translation>
     </message>

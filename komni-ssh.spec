@@ -1,5 +1,5 @@
 Name:           komni-ssh
-Version:        1.0.3
+Version:        1.0.5
 Release:        1%{?dist}
 Summary:        KDE native SSH connection and remote status monitor
 
@@ -45,6 +45,11 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/pixmaps/%{name}.png
 
 %changelog
+* Wed Jul 08 2026 mk <mk@address.com> - 1.0.5-1
+- Implement Start Minimized toggle setting on Appearance tab
+- Implement window size tracking and restoration
+- Update translations for German, French, and Chinese
+
 * Fri Jun 26 2026 mk <mk@address.com> - 1.0.3-1
 - Fix system language settings detection to support KDE Plasma locale and environment variables fallback
 - Fix all compiler warnings (unused variables/parameters, unused slot function)

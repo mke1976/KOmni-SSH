@@ -238,6 +238,14 @@
         <translation>系统（跟随 KDE 设置）</translation>
     </message>
     <message>
+        <source>Behavior</source>
+        <translation>行为</translation>
+    </message>
+    <message>
+        <source>Start minimized</source>
+        <translation>启动时最小化</translation>
+    </message>
+    <message>
         <source>Import / Export</source>
         <translation>导入 / 导出</translation>
     </message>

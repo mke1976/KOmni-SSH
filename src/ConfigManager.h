@@ -49,6 +49,9 @@ public:
     QString sheetCsvUrl;
     QString theme;
     QPalette systemPalette;
+    bool startMinimized = false;
+    int windowWidth = 500;
+    int windowHeight = 600;
 
     void applyTheme();
 

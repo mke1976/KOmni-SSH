@@ -159,10 +159,11 @@ void ComputerCardWidget::setUnknownStatus() {
 // -----------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle(tr("KOmni-SSH status"));
-    resize(500, 600);
     setWindowIcon(QIcon(":/icons/app_icon.png"));
 
     ConfigManager::instance().load();
+    const auto& config = ConfigManager::instance();
+    resize(config.windowWidth, config.windowHeight);
 
     setupUi();
     setupTrayIcon();
@@ -228,7 +229,7 @@ void MainWindow::setupUi() {
 
 void MainWindow::setupTrayIcon() {
     m_trayIcon = new QSystemTrayIcon(this);
-    m_trayIcon->setIcon(QIcon(":/icons/app_icon.png"));
+    m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent.png"));
     m_trayIcon->setToolTip(tr("KOmni-SSH Status Monitor"));
 
     QMenu* trayMenu = new QMenu(this);
@@ -395,6 +396,13 @@ void MainWindow::checkStatusChanges() {
             bool isOnline = (currentTs - ts <= 720);
             card->updateStatus(isOnline, ts);
 
+            if (isOnline) {
+                // Icon is already set to red dot by the showMessage call above.
+                // We will reset it when the app is shown or when PCs go offline.
+            } else {
+                m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent.png")); // Reset to default icon
+            }
+
             QString currentStateStr = isOnline ? "online" : "offline";
             QString prevStateStr = m_prevStates.value(nick, "unknown");
 
@@ -424,6 +432,7 @@ void MainWindow::checkStatusChanges() {
                         m_trayIcon->icon(), // use custom ic_launcher-playstore app icon
                         7000
                     );
+                    m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent_red_dot.png")); // Change icon to red dot
                 }
             }
             m_prevStates[nick] = currentStateStr;
@@ -450,6 +459,8 @@ void MainWindow::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason) {
         } else {
             showNormal();
             activateWindow();
+            // Reset tray icon to default when the main window is shown
+            m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent.png")); 
         }
     }
 }
@@ -471,4 +482,20 @@ void MainWindow::changeEvent(QEvent* event) {
         }
     }
     QMainWindow::changeEvent(event);
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event) {
+    QMainWindow::resizeEvent(event);
+    if (isVisible() && !isMinimized() && !isMaximized()) {
+        auto& config = ConfigManager::instance();
+        config.windowWidth = width();
+        config.windowHeight = height();
+        config.save();
+    }
+}
+
+void MainWindow::showEvent(QShowEvent* event) {
+    QMainWindow::showEvent(event);
+    const auto& config = ConfigManager::instance();
+    resize(config.windowWidth, config.windowHeight);
 }

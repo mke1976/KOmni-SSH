@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     // Set style (on Plasma this automatically defaults to native Breeze)
-    app.setWindowIcon(QIcon(":/icons/app_icon.png"));
+    app.setWindowIcon(QIcon(":/icons/app_icon_transparent.png"));
 
     // Capture system palette BEFORE any theme is applied
     ConfigManager::instance().systemPalette = app.palette();
@@ -143,7 +143,9 @@ int main(int argc, char *argv[]) {
     }
 
     MainWindow w;
-    w.show();
+    if (!ConfigManager::instance().startMinimized) {
+        w.show();
+    }
 
     return app.exec();
 }
