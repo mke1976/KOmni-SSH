@@ -1,5 +1,5 @@
 Name:           komni-ssh
-Version:        1.0.5
+Version:        1.0.6
 Release:        1%{?dist}
 Summary:        KDE native SSH connection and remote status monitor
 
@@ -45,6 +45,11 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/pixmaps/%{name}.png
 
 %changelog
+* Thu Jul 09 2026 mk <mk@address.com> - 1.0.6-1
+- Implement Enable Autostart setting under Behavior section of Settings menu
+- Ensure Autostart conforms to Minimized startup status or last used window size
+- Update German, French, and Chinese translations
+
 * Wed Jul 08 2026 mk <mk@address.com> - 1.0.5-1
 - Implement Start Minimized toggle setting on Appearance tab
 - Implement window size tracking and restoration

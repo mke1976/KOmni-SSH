@@ -59,6 +59,7 @@ private:
     QRadioButton* m_darkRadio = nullptr;
     QRadioButton* m_systemRadio = nullptr;
     QCheckBox* m_startMinimizedCheck = nullptr;
+    QCheckBox* m_enableAutostartCheck = nullptr;
 
     QVector<NgrokUi> m_ngrokUi;
     QVector<VpnUi> m_vpnUi;

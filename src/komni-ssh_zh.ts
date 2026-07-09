@@ -246,6 +246,10 @@
         <translation>启动时最小化</translation>
     </message>
     <message>
+        <source>Enable Autostart</source>
+        <translation>启用开机自启</translation>
+    </message>
+    <message>
         <source>Import / Export</source>
         <translation>导入 / 导出</translation>
     </message>

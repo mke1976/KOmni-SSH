@@ -50,6 +50,7 @@ public:
     QString theme;
     QPalette systemPalette;
     bool startMinimized = false;
+    bool enableAutostart = false;
     int windowWidth = 500;
     int windowHeight = 600;
 

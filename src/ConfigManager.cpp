@@ -33,6 +33,29 @@ void ConfigManager::save() {
     QFileInfo info(path);
     QDir().mkpath(info.absolutePath());
     saveToFile(path);
+
+    // Update KDE autostart desktop entry
+    QString autostartDir = QDir::homePath() + "/.config/autostart";
+    QString desktopPath = autostartDir + "/komni-ssh.desktop";
+    if (enableAutostart) {
+        QDir().mkpath(autostartDir);
+        QFile file(desktopPath);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream out(&file);
+            out << "[Desktop Entry]\n"
+                << "Name=KOmni-SSH\n"
+                << "Comment=SSH Connection and Remote Status Monitor\n"
+                << "Exec=komni-ssh\n"
+                << "Icon=komni-ssh\n"
+                << "Terminal=false\n"
+                << "Type=Application\n"
+                << "Categories=Utility;Network;\n"
+                << "StartupNotify=true\n";
+            file.close();
+        }
+    } else {
+        QFile::remove(desktopPath);
+    }
 }
 
 void ConfigManager::importConfig(const QString& path) {
@@ -49,6 +72,7 @@ void ConfigManager::initDefaults() {
     sheetCsvUrl = "https://docs.google.com/spreadsheets/d/1n3QWceMh5V1npxnWZv8Z25BHoqJCuv_lVu26dbqabDM/export?format=csv";
     theme = "system";
     startMinimized = false;
+    enableAutostart = false;
     windowWidth = 500;
     windowHeight = 600;
 
@@ -125,6 +149,7 @@ void ConfigManager::loadFromFile(const QString& path) {
     if (keyValues.contains("SHEET_CSV_URL")) sheetCsvUrl = keyValues["SHEET_CSV_URL"];
     if (keyValues.contains("THEME")) theme = keyValues["THEME"];
     if (keyValues.contains("START_MINIMIZED")) startMinimized = (keyValues["START_MINIMIZED"] == "ON");
+    if (keyValues.contains("ENABLE_AUTOSTART")) enableAutostart = (keyValues["ENABLE_AUTOSTART"] == "ON");
     if (keyValues.contains("WINDOW_WIDTH")) {
         bool ok;
         int w = keyValues["WINDOW_WIDTH"].toInt(&ok);
@@ -187,6 +212,7 @@ void ConfigManager::saveToFile(const QString& path) {
     out << "SHEET_CSV_URL=\"" << sheetCsvUrl << "\"\n";
     out << "THEME=\"" << theme << "\"\n";
     out << "START_MINIMIZED=\"" << (startMinimized ? "ON" : "OFF") << "\"\n";
+    out << "ENABLE_AUTOSTART=\"" << (enableAutostart ? "ON" : "OFF") << "\"\n";
     out << "WINDOW_WIDTH=\"" << windowWidth << "\"\n";
     out << "WINDOW_HEIGHT=\"" << windowHeight << "\"\n";
 

@@ -246,6 +246,10 @@
         <translation>Démarrer minimisé</translation>
     </message>
     <message>
+        <source>Enable Autostart</source>
+        <translation>Activer le démarrage automatique</translation>
+    </message>
+    <message>
         <source>Import / Export</source>
         <translation>Importer / Exporter</translation>
     </message>

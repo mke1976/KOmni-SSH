@@ -295,6 +295,9 @@ QWidget* SettingsDialog::createLookAndFeelSection() {
     m_startMinimizedCheck = new QCheckBox(tr("Start minimized"), behaviorBox);
     behaviorLayout->addWidget(m_startMinimizedCheck);
 
+    m_enableAutostartCheck = new QCheckBox(tr("Enable Autostart"), behaviorBox);
+    behaviorLayout->addWidget(m_enableAutostartCheck);
+
     layout->addWidget(behaviorBox);
     layout->addStretch();
 
@@ -341,6 +344,7 @@ void SettingsDialog::loadSettings() {
     }
 
     m_startMinimizedCheck->setChecked(config.startMinimized);
+    m_enableAutostartCheck->setChecked(config.enableAutostart);
 
     // Ngrok
     for (int i = 0; i < 5; ++i) {
@@ -395,6 +399,7 @@ void SettingsDialog::saveSettings() {
     }
 
     config.startMinimized = m_startMinimizedCheck->isChecked();
+    config.enableAutostart = m_enableAutostartCheck->isChecked();
 
     config.applyTheme();
 
