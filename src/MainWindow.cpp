@@ -16,6 +16,7 @@
 #include <QMouseEvent>
 #include <QStyle>
 #include <QApplication>
+#include <QProcess>
 
 // -----------------------------------------------------------------------------
 // ComputerCardWidget Implementation
@@ -388,6 +389,11 @@ void MainWindow::parseCsvData(const QByteArray& data) {
 void MainWindow::checkStatusChanges() {
     qint64 currentTs = QDateTime::currentSecsSinceEpoch();
 
+    // Track whether any monitored PC is currently online (for tray icon after loop)
+    bool anyMonitoredOnline = false;
+    // Collect names of PCs that just came online and have monitoring enabled
+    QStringList newlyOnlineNames;
+
     for (ComputerCardWidget* card : m_cardWidgets) {
         QString nick = card->nickname();
         if (m_currentStatuses.contains(nick)) {
@@ -396,51 +402,61 @@ void MainWindow::checkStatusChanges() {
             bool isOnline = (currentTs - ts <= 720);
             card->updateStatus(isOnline, ts);
 
-            if (isOnline) {
-                // Icon is already set to red dot by the showMessage call above.
-                // We will reset it when the app is shown or when PCs go offline.
-            } else {
-                m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent.png")); // Reset to default icon
-            }
-
             QString currentStateStr = isOnline ? "online" : "offline";
             QString prevStateStr = m_prevStates.value(nick, "unknown");
 
-            // Transitions to online trigger notification if enabled
-            if (currentStateStr == "online" && prevStateStr != "online") {
-                bool isMonitored = false;
-                const auto& config = ConfigManager::instance();
-
-                if (card->cardType() == ComputerCardWidget::Ngrok) {
-                    for (const auto& pc : config.ngrokPcs) {
-                        if (pc.nickname == nick && pc.enabled) isMonitored = pc.monitor;
-                    }
-                } else if (card->cardType() == ComputerCardWidget::Vpn) {
-                    for (const auto& pc : config.vpnPcs) {
-                        if (pc.nickname == nick && pc.enabled) isMonitored = pc.monitor;
-                    }
-                } else if (card->cardType() == ComputerCardWidget::Direct) {
-                    for (const auto& pc : config.directPcs) {
-                        if (pc.nickname == nick && pc.enabled) isMonitored = pc.monitor;
-                    }
+            // Check if this PC has monitoring enabled
+            bool isMonitored = false;
+            const auto& config = ConfigManager::instance();
+            if (card->cardType() == ComputerCardWidget::Ngrok) {
+                for (const auto& pc : config.ngrokPcs) {
+                    if (pc.nickname == nick && pc.enabled) isMonitored = pc.monitor;
                 }
-
-                if (isMonitored && !m_firstRun) {
-                    m_trayIcon->showMessage(
-                        tr("Computer Online"),
-                        tr("%1 is now ONLINE").arg(card->name()),
-                        m_trayIcon->icon(), // use custom ic_launcher-playstore app icon
-                        7000
-                    );
-                    m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent_red_dot.png")); // Change icon to red dot
+            } else if (card->cardType() == ComputerCardWidget::Vpn) {
+                for (const auto& pc : config.vpnPcs) {
+                    if (pc.nickname == nick && pc.enabled) isMonitored = pc.monitor;
+                }
+            } else if (card->cardType() == ComputerCardWidget::Direct) {
+                for (const auto& pc : config.directPcs) {
+                    if (pc.nickname == nick && pc.enabled) isMonitored = pc.monitor;
                 }
             }
+
+            if (isOnline && isMonitored) {
+                anyMonitoredOnline = true;
+            }
+
+            // Transitions to online trigger KDE notification if enabled
+            if (currentStateStr == "online" && prevStateStr != "online"
+                    && isMonitored && !m_firstRun) {
+                newlyOnlineNames.append(card->name());
+            }
+
             m_prevStates[nick] = currentStateStr;
         } else {
             card->setUnknownStatus();
             m_prevStates[nick] = "unknown";
         }
     }
+
+    // Send native KDE D-Bus notifications for each newly online monitored PC
+    for (const QString& pcName : newlyOnlineNames) {
+        QProcess::startDetached("notify-send",
+            QStringList()
+                << "-i" << ":/icons/app_icon.png"
+                << "-t" << "7000"
+                << tr("Computer Online")
+                << tr("%1 is now ONLINE").arg(pcName));
+    }
+
+    // Update tray icon: show red dot only when window is hidden and a monitored PC is online
+    if (anyMonitoredOnline && !isVisible()) {
+        m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent_red_dot.png"));
+    } else if (!anyMonitoredOnline) {
+        // No monitored PC is online — always revert to default icon
+        m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent.png"));
+    }
+    // If anyMonitoredOnline && isVisible(): leave icon as default (window is open)
 
     m_firstRun = false;
 }
@@ -459,8 +475,6 @@ void MainWindow::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason) {
         } else {
             showNormal();
             activateWindow();
-            // Reset tray icon to default when the main window is shown
-            m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent.png")); 
         }
     }
 }
@@ -498,4 +512,6 @@ void MainWindow::showEvent(QShowEvent* event) {
     QMainWindow::showEvent(event);
     const auto& config = ConfigManager::instance();
     resize(config.windowWidth, config.windowHeight);
+    // Reset tray icon to default whenever the window becomes visible
+    m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent.png"));
 }

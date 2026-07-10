@@ -1,5 +1,5 @@
 Name:           komni-ssh
-Version:        1.0.6
+Version:        1.0.7
 Release:        1%{?dist}
 Summary:        KDE native SSH connection and remote status monitor
 
@@ -45,6 +45,13 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/pixmaps/%{name}.png
 
 %changelog
+* Thu Jul 10 2026 mk <mk@address.com> - 1.0.7-1
+- Fix KDE notifications: switch from broken QSystemTrayIcon::showMessage() to
+  native D-Bus notifications via notify-send for proper KDE integration
+- Fix tray icon red dot logic: icon now correctly persists when any monitored
+  PC is online and window is hidden; resets on window show
+- Add QProcess include for notify-send invocation
+
 * Thu Jul 09 2026 mk <mk@address.com> - 1.0.6-1
 - Implement Enable Autostart setting under Behavior section of Settings menu
 - Ensure Autostart conforms to Minimized startup status or last used window size
