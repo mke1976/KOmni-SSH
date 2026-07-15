@@ -158,6 +158,18 @@
         <translation>CSV 格式的 Google 表格 URL</translation>
     </message>
     <message>
+        <source>Google Sheet Refresh Period:</source>
+        <translation>Google 表格刷新周期：</translation>
+    </message>
+    <message>
+        <source> minutes</source>
+        <translation> 分钟</translation>
+    </message>
+    <message>
+        <source>Google Sheet refresh period in minutes (1-90)</source>
+        <translation>Google 表格刷新周期（分钟，1-90）</translation>
+    </message>
+    <message>
         <source>Global: Key Passphrase:</source>
         <translation>全局：密钥口令：</translation>
     </message>

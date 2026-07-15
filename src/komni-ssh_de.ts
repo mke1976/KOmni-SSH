@@ -158,6 +158,18 @@
         <translation>Google-Tabellen-URL im CSV-Format</translation>
     </message>
     <message>
+        <source>Google Sheet Refresh Period:</source>
+        <translation>Google-Tabellen-Aktualisierungsintervall:</translation>
+    </message>
+    <message>
+        <source> minutes</source>
+        <translation> Minuten</translation>
+    </message>
+    <message>
+        <source>Google Sheet refresh period in minutes (1-90)</source>
+        <translation>Aktualisierungsintervall der Google-Tabelle in Minuten (1-90)</translation>
+    </message>
+    <message>
         <source>Global: Key Passphrase:</source>
         <translation>Global: Schlüssel-Passphrase:</translation>
     </message>

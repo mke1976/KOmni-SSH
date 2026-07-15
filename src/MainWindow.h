@@ -84,6 +84,8 @@ private:
     QMap<QString, qint64> m_currentStatuses; // nickname -> timestamp
     QMap<QString, QString> m_prevStates;    // nickname -> "online"/"offline"
     bool m_firstRun = true;
+    bool m_redDotActive = false;
+    bool m_isRefreshing = false;
 
     QVector<ComputerCardWidget*> m_cardWidgets;
 };

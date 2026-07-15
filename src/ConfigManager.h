@@ -53,6 +53,7 @@ public:
     bool enableAutostart = false;
     int windowWidth = 500;
     int windowHeight = 600;
+    int sheetRefreshInterval = 10;
 
     void applyTheme();
 

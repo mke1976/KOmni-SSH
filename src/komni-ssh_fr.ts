@@ -158,6 +158,18 @@
         <translation>URL Google Sheet au format CSV</translation>
     </message>
     <message>
+        <source>Google Sheet Refresh Period:</source>
+        <translation>Période de rafraîchissement Google Sheet :</translation>
+    </message>
+    <message>
+        <source> minutes</source>
+        <translation> minutes</translation>
+    </message>
+    <message>
+        <source>Google Sheet refresh period in minutes (1-90)</source>
+        <translation>Période de rafraîchissement Google Sheet en minutes (1-90)</translation>
+    </message>
+    <message>
         <source>Global: Key Passphrase:</source>
         <translation>Global : Phrase secrète de clé :</translation>
     </message>

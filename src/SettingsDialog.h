@@ -6,19 +6,20 @@
 #include <QPushButton>
 #include <QVector>
 #include <QRadioButton>
+#include <QSpinBox>
 #include "ConfigManager.h"
-
+ 
 class SettingsDialog : public QDialog {
     Q_OBJECT
 public:
     explicit SettingsDialog(QWidget* parent = nullptr);
     ~SettingsDialog() = default;
-
+ 
 private:
     void setupUi();
     void loadSettings();
     void saveSettings();
-
+ 
     // UI tracking structures
     struct NgrokUi {
         QCheckBox* enabledCheck = nullptr;
@@ -28,7 +29,7 @@ private:
         QCheckBox* monCheck = nullptr;
         QWidget* container = nullptr;
     };
-
+ 
     struct VpnUi {
         QCheckBox* enabledCheck = nullptr;
         QLineEdit* nameEdit = nullptr;
@@ -39,7 +40,7 @@ private:
         QCheckBox* monCheck = nullptr;
         QWidget* container = nullptr;
     };
-
+ 
     struct DirectUi {
         QCheckBox* enabledCheck = nullptr;
         QLineEdit* nameEdit = nullptr;
@@ -49,10 +50,11 @@ private:
         QCheckBox* monCheck = nullptr;
         QWidget* container = nullptr;
     };
-
+ 
     // Global edits
     QLineEdit* m_sshPassEdit = nullptr;
     QLineEdit* m_csvUrlEdit = nullptr;
+    QSpinBox* m_csvRefreshIntervalSpin = nullptr;
 
     // Look & Feel edits
     QRadioButton* m_lightRadio = nullptr;

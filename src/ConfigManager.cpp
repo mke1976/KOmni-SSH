@@ -75,6 +75,7 @@ void ConfigManager::initDefaults() {
     enableAutostart = false;
     windowWidth = 500;
     windowHeight = 600;
+    sheetRefreshInterval = 10;
 
     ngrokPcs.clear();
     ngrokPcs.resize(5);
@@ -160,6 +161,13 @@ void ConfigManager::loadFromFile(const QString& path) {
         int h = keyValues["WINDOW_HEIGHT"].toInt(&ok);
         if (ok) windowHeight = h;
     }
+    if (keyValues.contains("SHEET_REFRESH_INTERVAL")) {
+        bool ok;
+        int val = keyValues["SHEET_REFRESH_INTERVAL"].toInt(&ok);
+        if (ok && val >= 1 && val <= 90) {
+            sheetRefreshInterval = val;
+        }
+    }
 
     // Ngrok (N1 to N5)
     for (int i = 0; i < 5; ++i) {
@@ -215,6 +223,7 @@ void ConfigManager::saveToFile(const QString& path) {
     out << "ENABLE_AUTOSTART=\"" << (enableAutostart ? "ON" : "OFF") << "\"\n";
     out << "WINDOW_WIDTH=\"" << windowWidth << "\"\n";
     out << "WINDOW_HEIGHT=\"" << windowHeight << "\"\n";
+    out << "SHEET_REFRESH_INTERVAL=\"" << sheetRefreshInterval << "\"\n";
 
     // Ngrok
     for (int i = 0; i < 5; ++i) {

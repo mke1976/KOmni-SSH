@@ -1,5 +1,5 @@
 Name:           komni-ssh
-Version:        1.0.7
+Version:        1.0.8
 Release:        1%{?dist}
 Summary:        KDE native SSH connection and remote status monitor
 
@@ -45,6 +45,12 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/pixmaps/%{name}.png
 
 %changelog
+* Wed Jul 15 2026 mk <mk@address.com> - 1.0.8-1
+- Refine status bar red-dot logic to prevent reappearing on subsequent sheet checks
+- Fix KDE notifications by passing app-name and using system-installed icon
+- Add Google Sheet check upon bringing program to foreground
+- Implement configurable Google Sheet refresh period (1-90 minutes) with translations
+
 * Thu Jul 10 2026 mk <mk@address.com> - 1.0.7-1
 - Fix KDE notifications: switch from broken QSystemTrayIcon::showMessage() to
   native D-Bus notifications via notify-send for proper KDE integration

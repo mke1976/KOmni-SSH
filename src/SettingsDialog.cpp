@@ -91,6 +91,12 @@ QWidget* SettingsDialog::createGlobalSection() {
     m_csvUrlEdit->setToolTip(tr("Google Sheet URL in CSV format"));
     form->addRow(tr("Google Sheet URL:"), m_csvUrlEdit);
 
+    m_csvRefreshIntervalSpin = new QSpinBox(box);
+    m_csvRefreshIntervalSpin->setRange(1, 90);
+    m_csvRefreshIntervalSpin->setSuffix(tr(" minutes"));
+    m_csvRefreshIntervalSpin->setToolTip(tr("Google Sheet refresh period in minutes (1-90)"));
+    form->addRow(tr("Google Sheet Refresh Period:"), m_csvRefreshIntervalSpin);
+
     m_sshPassEdit = new QLineEdit(box);
     m_sshPassEdit->setEchoMode(QLineEdit::Password);
     m_sshPassEdit->setToolTip(tr("Global SSH password if sshpass is used"));
@@ -332,6 +338,7 @@ void SettingsDialog::loadSettings() {
     const auto& config = ConfigManager::instance();
 
     m_csvUrlEdit->setText(config.sheetCsvUrl);
+    m_csvRefreshIntervalSpin->setValue(config.sheetRefreshInterval);
     m_sshPassEdit->setText(config.globalSshPass);
 
     // Look and feel
@@ -387,6 +394,7 @@ void SettingsDialog::saveSettings() {
     auto& config = ConfigManager::instance();
 
     config.sheetCsvUrl = m_csvUrlEdit->text().trimmed();
+    config.sheetRefreshInterval = m_csvRefreshIntervalSpin->value();
     config.globalSshPass = m_sshPassEdit->text();
 
     // Look and feel

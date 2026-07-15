@@ -316,18 +316,20 @@ void MainWindow::rebuildCards() {
 
 void MainWindow::startPolling() {
     m_refreshTimer = new QTimer(this);
-    // Refresh every 10 minutes (600,000 milliseconds)
     connect(m_refreshTimer, &QTimer::timeout, this, &MainWindow::onRefreshTriggered);
-    m_refreshTimer->start(600000);
+    m_refreshTimer->start(ConfigManager::instance().sheetRefreshInterval * 60000);
 }
 
 void MainWindow::onRefreshTriggered() {
+    if (m_isRefreshing) return;
+
     QString urlStr = ConfigManager::instance().sheetCsvUrl;
     if (urlStr.isEmpty()) {
         m_lastRefreshedLabel->setText(tr("Last Refresh: Fail (No Sheets URL set)"));
         return;
     }
 
+    m_isRefreshing = true;
     m_lastRefreshedLabel->setText(tr("Refreshing remote computer status..."));
     QUrl url(urlStr);
     QNetworkRequest request(url);
@@ -338,6 +340,8 @@ void MainWindow::onRefreshTriggered() {
 void MainWindow::handleCsvReply() {
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply) return;
+
+    m_isRefreshing = false;
 
     if (reply->error() != QNetworkReply::NoError) {
         m_lastRefreshedLabel->setText(tr("Last Refresh: Fail (%1)").arg(reply->errorString()));
@@ -394,6 +398,8 @@ void MainWindow::checkStatusChanges() {
     // Collect names of PCs that just came online and have monitoring enabled
     QStringList newlyOnlineNames;
 
+    bool isForeground = isVisible() && !isMinimized() && isActiveWindow();
+
     for (ComputerCardWidget* card : m_cardWidgets) {
         QString nick = card->nickname();
         if (m_currentStatuses.contains(nick)) {
@@ -424,12 +430,18 @@ void MainWindow::checkStatusChanges() {
 
             if (isOnline && isMonitored) {
                 anyMonitoredOnline = true;
+                if (m_firstRun) {
+                    m_redDotActive = true;
+                }
             }
 
             // Transitions to online trigger KDE notification if enabled
             if (currentStateStr == "online" && prevStateStr != "online"
                     && isMonitored && !m_firstRun) {
                 newlyOnlineNames.append(card->name());
+                if (!isForeground) {
+                    m_redDotActive = true;
+                }
             }
 
             m_prevStates[nick] = currentStateStr;
@@ -443,20 +455,23 @@ void MainWindow::checkStatusChanges() {
     for (const QString& pcName : newlyOnlineNames) {
         QProcess::startDetached("notify-send",
             QStringList()
-                << "-i" << ":/icons/app_icon.png"
+                << "-a" << "komni-ssh"
+                << "-i" << "komni-ssh"
                 << "-t" << "7000"
                 << tr("Computer Online")
                 << tr("%1 is now ONLINE").arg(pcName));
     }
 
-    // Update tray icon: show red dot only when window is hidden and a monitored PC is online
-    if (anyMonitoredOnline && !isVisible()) {
+    if (!anyMonitoredOnline) {
+        m_redDotActive = false;
+    }
+
+    // Update tray icon: show red dot only when window is hidden and red dot state is active
+    if (m_redDotActive && !isVisible()) {
         m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent_red_dot.png"));
-    } else if (!anyMonitoredOnline) {
-        // No monitored PC is online — always revert to default icon
+    } else {
         m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent.png"));
     }
-    // If anyMonitoredOnline && isVisible(): leave icon as default (window is open)
 
     m_firstRun = false;
 }
@@ -465,6 +480,9 @@ void MainWindow::onSettingsTriggered() {
     SettingsDialog dialog(this);
     if (dialog.exec() == QDialog::Accepted) {
         rebuildCards();
+        if (m_refreshTimer) {
+            m_refreshTimer->start(ConfigManager::instance().sheetRefreshInterval * 60000);
+        }
     }
 }
 
@@ -495,6 +513,13 @@ void MainWindow::changeEvent(QEvent* event) {
             QTimer::singleShot(250, this, &QWidget::hide);
         }
     }
+    if (event->type() == QEvent::WindowActivate || event->type() == QEvent::ActivationChange) {
+        if (isActiveWindow() && isVisible() && !isMinimized()) {
+            m_redDotActive = false;
+            m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent.png"));
+            onRefreshTriggered();
+        }
+    }
     QMainWindow::changeEvent(event);
 }
 
@@ -513,5 +538,7 @@ void MainWindow::showEvent(QShowEvent* event) {
     const auto& config = ConfigManager::instance();
     resize(config.windowWidth, config.windowHeight);
     // Reset tray icon to default whenever the window becomes visible
+    m_redDotActive = false;
     m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent.png"));
+    onRefreshTriggered();
 }
