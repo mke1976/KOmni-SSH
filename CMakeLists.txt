@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(komni-ssh VERSION 1.0.8 LANGUAGES CXX)
+project(komni-ssh VERSION 1.0.9 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -33,6 +33,7 @@ add_executable(komni-ssh ${SOURCES})
 
 # Link libraries
 target_link_libraries(komni-ssh PRIVATE Qt6::Widgets Qt6::Network)
+target_compile_definitions(komni-ssh PRIVATE APP_VERSION="${PROJECT_VERSION}")
 
 # Installation definitions
 include(GNUInstallDirs)

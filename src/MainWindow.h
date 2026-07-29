@@ -60,6 +60,7 @@ protected:
 private slots:
     void onRefreshTriggered();
     void onSettingsTriggered();
+    void onAboutTriggered();
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
     void handleCsvReply();
 

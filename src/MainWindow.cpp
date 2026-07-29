@@ -179,6 +179,11 @@ void MainWindow::setupUi() {
     connect(configureAct, &QAction::triggered, this, &MainWindow::onSettingsTriggered);
     settingsMenu->addAction(configureAct);
 
+    QMenu* helpMenu = m_menuBar->addMenu(tr("Help"));
+    QAction* aboutAct = new QAction(tr("About KOmni-SSH"), this);
+    connect(aboutAct, &QAction::triggered, this, &MainWindow::onAboutTriggered);
+    helpMenu->addAction(aboutAct);
+
     QWidget* central = new QWidget(this);
     QVBoxLayout* mainLayout = new QVBoxLayout(central);
     mainLayout->setContentsMargins(10, 10, 10, 10);
@@ -457,6 +462,7 @@ void MainWindow::checkStatusChanges() {
             QStringList()
                 << "-a" << "komni-ssh"
                 << "-i" << "komni-ssh"
+                << "-h" << "string:desktop-entry:komni-ssh"
                 << "-t" << "7000"
                 << tr("Computer Online")
                 << tr("%1 is now ONLINE").arg(pcName));
@@ -541,4 +547,9 @@ void MainWindow::showEvent(QShowEvent* event) {
     m_redDotActive = false;
     m_trayIcon->setIcon(QIcon(":/icons/app_icon_transparent.png"));
     onRefreshTriggered();
+}
+
+void MainWindow::onAboutTriggered() {
+    QMessageBox::about(this, tr("About KOmni-SSH"),
+        tr("KOmni-SSH Status Monitor\nVersion %1\n\nKDE native SSH connection and remote status monitor.").arg(APP_VERSION));
 }

@@ -1,5 +1,5 @@
 Name:           komni-ssh
-Version:        1.0.8
+Version:        1.0.9
 Release:        1%{?dist}
 Summary:        KDE native SSH connection and remote status monitor
 
@@ -45,6 +45,10 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/pixmaps/%{name}.png
 
 %changelog
+* Wed Jul 29 2026 mk <mk@address.com> - 1.0.9-1
+- Save notify-send notifications to the KDE status bar notification history (bell dialog)
+- Implement an About menu item displaying version of the program
+
 * Wed Jul 15 2026 mk <mk@address.com> - 1.0.8-1
 - Refine status bar red-dot logic to prevent reappearing on subsequent sheet checks
 - Fix KDE notifications by passing app-name and using system-installed icon

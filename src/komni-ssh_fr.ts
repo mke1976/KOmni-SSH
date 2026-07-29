@@ -126,6 +126,18 @@
         <source>%1 is now ONLINE</source>
         <translation>%1 est maintenant EN LIGNE</translation>
     </message>
+    <message>
+        <source>Help</source>
+        <translation>Aide</translation>
+    </message>
+    <message>
+        <source>About KOmni-SSH</source>
+        <translation>À propos de KOmni-SSH</translation>
+    </message>
+    <message>
+        <source>KOmni-SSH Status Monitor\nVersion %1\n\nKDE native SSH connection and remote status monitor.</source>
+        <translation>Moniteur de statut KOmni-SSH\nVersion %1\n\nConnexion SSH native KDE et moniteur de statut distant.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsDialog</name>
